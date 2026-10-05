@@ -44,7 +44,6 @@ const WEEK: Day[] = [
   },
   {
     breakfast: [['idli', 3], ['sambar', 1], ['coconut-chutney', 1], ['coffee', 1]],
-    lunch: [['rice', 2], ['sambar', 1], ['poriyal', 1], ['curd', 1]],
   },
 ]
 

@@ -277,7 +277,7 @@ function findPatterns(week: ReturnType<typeof reviewWeek>, a: Assessment): Insig
     })
   }
   const lowProteinDays = week.logged.filter((d) => totals(d).protein < tg.protein * 0.8).length
-  if (lowProteinDays >= Math.ceil(n / 2)) {
+  if (avg.protein < tg.protein * 0.9 || lowProteinDays >= Math.ceil(n / 2)) {
     out.push({
       id: 'low-protein',
       band: 'watch',
