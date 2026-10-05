@@ -55,4 +55,4 @@ React 19, TypeScript, Vite; Transformers.js on ONNX Runtime Web (WebAssembly) ru
 
 - GitHub repository: https://github.com/andringodson/ThaliSense
 - Live project: https://thalisense.vercel.app
-- Demo video: Google Drive link to `ThaliSense-demo.mp4` (see `docs/submissions/README.md`)
+- Demo video: upload [ThaliSense-demo.mp4](https://github.com/andringodson/ThaliSense/releases/download/v1.0/ThaliSense-demo.mp4) to Google Drive (sharing: anyone with the link) and paste that link
