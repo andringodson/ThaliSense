@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ThaliSense deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<!--
+  One source for both pitch decks. Open with #shakti or #nexus to show that
+  deck's slides; print to PDF at 1280x720 (see docs/submissions/README.md).
+-->
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  :root { --bg: #0a0908; --s: #141210; --s2: #1c1916; --line: #2a2622; --t: #f4efe7; --m: #a39b90; --a: #ff9a3c; --g: #5fd38d; --w: #f5c451; --h: #ff6b5e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #333; font-family: Inter, sans-serif; color: var(--t); }
+  .slide { width: 1280px; height: 720px; background: var(--bg); position: relative; overflow: hidden; padding: 64px 72px; display: flex; flex-direction: column; break-after: page; margin: 0 auto 24px; }
+  @media print { body { background: none; } .slide { margin: 0; } }
+  .slide::after { content: ''; position: absolute; inset: auto -200px -260px auto; width: 640px; height: 640px; background: radial-gradient(circle, rgb(255 154 60 / 0.12), transparent 65%); pointer-events: none; }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.025em; margin: 0; }
+  h1 { font-size: 76px; line-height: 1; }
+  h2 { font-size: 44px; line-height: 1.08; margin-bottom: 28px; max-width: 1000px; }
+  h3 { font-size: 22px; margin-bottom: 6px; }
+  p { margin: 0; }
+  .kicker { font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--a); font-weight: 700; margin-bottom: 14px; }
+  .m { color: var(--m); }
+  .a { color: var(--a); }
+  .g { color: var(--g); }
+  .lede { font-size: 24px; line-height: 1.45; color: var(--m); max-width: 900px; }
+  .foot { position: absolute; left: 72px; right: 72px; bottom: 26px; display: flex; justify-content: space-between; font-size: 13px; color: var(--m); }
+  .grid { display: grid; gap: 18px; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: var(--s); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; }
+  .card p { color: var(--m); font-size: 17px; line-height: 1.45; }
+  .big { font-family: 'Space Grotesk'; font-size: 58px; font-weight: 700; color: var(--a); line-height: 1; margin-bottom: 8px; }
+  .shot { border-radius: 14px; border: 1px solid var(--line); width: 100%; display: block; object-fit: cover; object-position: top; }
+  ul.clean { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  ul.clean li { font-size: 20px; line-height: 1.4; padding-left: 30px; position: relative; }
+  ul.clean li::before { content: ''; position: absolute; left: 0; top: 9px; width: 12px; height: 12px; border-radius: 50%; background: var(--a); }
+  ul.clean li span { color: var(--m); }
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .flow .n { background: var(--s2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; font-size: 17px; font-weight: 600; }
+  .flow .n code { display: block; font: 500 12px 'JetBrains Mono', monospace; color: var(--a); margin-bottom: 2px; }
+  .flow .arr { color: var(--a); font-size: 22px; }
+  table { border-collapse: collapse; width: 100%; font-size: 17px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  th { color: var(--m); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  td.y { color: var(--g); font-weight: 600; } td.n { color: var(--m); }
+  .logo { display: flex; align-items: center; gap: 16px; font-family: 'Space Grotesk'; font-weight: 700; font-size: 30px; }
+  .pill { display: inline-block; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--s); font-size: 15px; margin: 0 8px 8px 0; }
+  .num { font-family: 'JetBrains Mono', monospace; }
+  [data-deck] { display: none; }
+</style>
+</head>
+<body>
+
+<!-- 1. Title (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="logo">
+    <svg width="56" height="56" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#ff9a3c" stroke-width="2"/><circle cx="11" cy="11" r="3.6" fill="#ff9a3c"/><circle cx="21" cy="11" r="3.6" fill="#5fd38d"/><circle cx="11" cy="21" r="3.6" fill="#f5c451"/><circle cx="21" cy="21" r="4.2" fill="none" stroke="#f4efe7" stroke-width="1.6"/></svg>
+    ThaliSense
+  </div>
+  <div style="margin-top: 110px">
+    <h1>Eat the food you love.<br /><span class="a">Know what it does to you.</span></h1>
+    <p class="lede" style="margin-top: 28px">An on-device AI nutrition and metabolic-health coach built for Indian meals.</p>
+  </div>
+  <div style="margin-top: auto">
+    <span class="pill shakti-only">SHAKTI Hackathon · Obesity Control &amp; Medical Fitness · AI-Agentic</span>
+    <span class="pill nexus-only">NEXUS InnovateX 2026 · IdeaPitch</span>
+    <span class="pill">Live: thalisense.vercel.app</span>
+    <span class="pill">github.com/andringodson/ThaliSense</span>
+  </div>
+</section>
+
+<!-- 2. Problem (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Problem</div>
+  <h2>India's diabetes and obesity crisis is cooked in everyday kitchens, and our tools don't speak its language.</h2>
+  <div class="grid g3" style="margin-bottom: 26px">
+    <div class="card"><div class="big">101 M</div><p>Indians living with diabetes</p></div>
+    <div class="card"><div class="big">136 M</div><p>more with prediabetes, mostly undiagnosed</p></div>
+    <div class="card"><div class="big">BMI 23</div><p>is where overweight starts for Asian Indians, not the global 25</p></div>
+  </div>
+  <ul class="clean">
+    <li>Calorie apps are built for Western diets. <span>They don't know pesarattu, bisi bele bath or kadhi, or what “do roti aur dahi” means.</span></li>
+    <li>Risk is mis-measured. <span>South Asians get diabetes at lower weight, so global BMI tells at-risk people they're fine.</span></li>
+    <li>“Eat less rice” doesn't stick, <span>dietitians are unaffordable, and people won't upload health data to a server.</span></li>
+  </ul>
+  <div class="foot"><span>Source: ICMR-INDIAB, Lancet Diabetes &amp; Endocrinology 2023; Misra et al., JAPI 2009</span><span>ThaliSense</span></div>
+</section>
+
+<!-- 3. Target users (nexus) -->
+<section class="slide" data-deck="nexus">
+  <div class="kicker">Target users</div>
+  <h2>Built for the Indian family kitchen, not the gym.</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Adults at metabolic risk</h3><p>25 to 55, desk jobs, family history of diabetes, a growing waistline. They want to act early without giving up home food.</p></div>
+    <div class="card"><h3>People with prediabetes</h3><p>Told by a doctor to “watch your diet”, with no idea what that means for idli, roti or biryani.</p></div>
+    <div class="card"><h3>Home cooks and caregivers</h3><p>The person planning meals for the whole family, on a budget, in a regional cuisine.</p></div>
+  </div>
+  <div class="grid g2" style="margin-top: 18px">
+    <div class="card"><h3>Later: health workers</h3><p>ASHA and community health workers screening villages with the Indian Diabetes Risk Score, offline on one phone.</p></div>
+    <div class="card"><h3>Later: employers and insurers</h3><p>Corporate wellness and health-insurance programmes that need a private, low-cost prevention tool.</p></div>
+  </div>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 4. Solution (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Proposed solution</div>
+  <h2>A coach that understands Indian food, measures risk the Indian way and plans meals you'll actually eat.</h2>
+  <div class="grid g4">
+    <div class="card"><h3>1 · Log</h3><p>Type it your way (“rendu dosai”, “2 roti, dal”) or snap a photo. On-device AI recognises 108 Indian dishes.</p></div>
+    <div class="card"><h3>2 · Understand</h3><p>Indian Diabetes Risk Score, Asian BMI cut-offs, waist-to-height ratio and personal calorie and protein targets.</p></div>
+    <div class="card"><h3>3 · Coach</h3><p>An agent finds what matters most and swaps foods you already eat, showing the weekly impact of each swap.</p></div>
+    <div class="card"><h3>4 · Plan</h3><p>A self-checked 7-day regional meal plan for your diet and ₹/day budget. Log any meal with one tap.</p></div>
+  </div>
+  <p class="lede" style="margin-top: 30px; font-size: 21px">Free. No sign-up. <span class="g">Nothing leaves your phone</span>: the AI runs inside the browser.</p>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 5. Product walk-through (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Working MVP · live today</div>
+  <h2 style="margin-bottom: 20px">From a photo of your thali to a week of better meals.</h2>
+  <div class="grid g3" style="gap: 14px">
+    <div><img class="shot" src="../screenshots/snap.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Snap: dish recognised on the device in about 1 second, with usual sides suggested.</p></div>
+    <div><img class="shot" src="../screenshots/coach.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Coach: an 8-step agent trace you can follow, plus insights and swaps.</p></div>
+    <div><img class="shot" src="../screenshots/plan.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Plan: 7 regional days within budget, with notes on what the coach adjusted.</p></div>
+  </div>
+  <div class="foot"><span>Try the demo week at thalisense.vercel.app</span><span>ThaliSense</span></div>
+</section>
+
+<!-- 6. Key features (nexus) -->
+<section class="slide" data-deck="nexus">
+  <div class="kicker">Key features</div>
+  <h2>Everything a dietitian would do in the first week, for free.</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Indian-first food data</h3><p>108 dishes with IFCT-2017-based nutrition, GI band and rupee cost; Hindi, Tamil and regional names.</p></div>
+    <div class="card"><h3>Natural-language logging</h3><p>Quantities, “do / rendu / aadha”, plurals, typos and compound dishes like curd rice.</p></div>
+    <div class="card"><h3>Photo recognition</h3><p>CLIP vision model on the device; 80% top-3 accuracy on real photos, and the user confirms.</p></div>
+    <div class="card"><h3>Clinical risk scores</h3><p>MDRF Indian Diabetes Risk Score, Asian BMI, waist-to-height ratio, with a prompt to get tested if at high risk.</p></div>
+    <div class="card"><h3>Explainable agent</h3><p>Shows each step it takes, swaps foods with measured weekly impact, and verifies and repairs its own plan.</p></div>
+    <div class="card"><h3>Private and offline</h3><p>No account and no server; works offline once loaded, and costs nothing to run per user.</p></div>
+  </div>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 7. Technology (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Technology · AI used</div>
+  <h2>Real AI, running entirely on the user's phone.</h2>
+  <div class="flow" style="margin-bottom: 26px">
+    <div class="n"><code>input</code>Typed meal / photo</div><span class="arr">→</span>
+    <div class="n"><code>parser · CLIP ViT-B/32</code>Dish recognition</div><span class="arr">→</span>
+    <div class="n"><code>localStorage</code>Meal log</div><span class="arr">→</span>
+    <div class="n"><code>coach agent</code>8 tool steps</div><span class="arr">→</span>
+    <div class="n"><code>output</code>Insights · swaps · plan</div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Vision: zero-shot CLIP in the browser</h3><p>Transformers.js on ONNX Runtime Web (WASM) in a Web Worker. Dish text embeddings are precomputed at build time with prompt ensembling, so the phone downloads only the 89 MB int8 vision encoder once and classifies a photo in about 1 second.</p></div>
+    <div class="card"><h3>Agent: plan, verify, repair</h3><p>A tool-based planner: <span class="num a">assess → review → detect → swap → plan → verify → budget → habits</span>. It scores 60 real meal templates on protein, fibre, glycaemic load, cost and region, scales the staples, then checks every day against the targets and fixes the misses.</p></div>
+  </div>
+  <p class="m" style="margin-top: 20px; font-size: 16px">React 19 · TypeScript · Vite · Transformers.js · ONNX Runtime Web · Vitest · Playwright · GitHub Actions · Vercel · no backend, no paid APIs</p>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 8. Implementation approach (shakti) -->
+<section class="slide" data-deck="shakti">
+  <div class="kicker">Implementation approach</div>
+  <h2>Built from scratch for SHAKTI, grounded in Indian clinical science.</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h3>How we built it</h3>
+      <ul class="clean" style="gap: 10px; margin-top: 10px">
+        <li style="font-size: 17px">Food data: 108 dishes from IFCT 2017 (ICMR-NIN) with serving sizes and cost</li>
+        <li style="font-size: 17px">Risk: MDRF IDRS, Asian BMI consensus, Mifflin-St Jeor, ICMR-NIN 2024</li>
+        <li style="font-size: 17px">Vision: CLIP embeddings precomputed at build time; tested on 30 real photos</li>
+        <li style="font-size: 17px">Agent: template scoring with a verify-and-repair loop; 15 unit tests</li>
+        <li style="font-size: 17px">Shipped: CI on every push, auto-deploy to Vercel</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Status &amp; what is new</h3>
+      <p style="margin-top: 8px">Everything shown was built during the hackathon window. No pre-built project code was reused; open-source libraries (React, Transformers.js) and the public CLIP model are credited.</p>
+      <table style="margin-top: 14px; font-size: 16px">
+        <tr><td>Typed logging, 108 dishes</td><td class="y">Live</td></tr>
+        <tr><td>On-device photo recognition</td><td class="y">Live</td></tr>
+        <tr><td>Risk scores and targets</td><td class="y">Live</td></tr>
+        <tr><td>Coach agent and 7-day plan</td><td class="y">Live</td></tr>
+        <tr><td>Multi-dish thali, voice in Indian languages</td><td class="n">Next</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 9. Market / use case (nexus) -->
+<section class="slide" data-deck="nexus">
+  <div class="kicker">Market &amp; use cases</div>
+  <h2>Prevention is India's biggest health opportunity, and food is where it starts.</h2>
+  <div class="grid g3">
+    <div class="card"><div class="big">237 M</div><p>Indians with diabetes or prediabetes who would benefit from diet guidance today (ICMR-INDIAB 2023).</p></div>
+    <div class="card"><div class="big">₹0</div><p>marginal cost per user: compute runs on the user's own phone, so the app scales without server bills.</p></div>
+    <div class="card"><div class="big">4</div><p>regional cuisines and 3 diet types from day one, so it fits most Indian households.</p></div>
+  </div>
+  <div class="grid g3" style="margin-top: 18px">
+    <div class="card"><h3>Individuals</h3><p>Daily logging, weekly coaching and a meal plan for the family.</p></div>
+    <div class="card"><h3>Clinics &amp; labs</h3><p>Patients who score high on IDRS are referred for HbA1c testing; dietitians get a coaching companion app.</p></div>
+    <div class="card"><h3>Public health</h3><p>ASHA workers run IDRS screening offline as part of national NCD prevention efforts.</p></div>
+  </div>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 10. Business model (nexus) -->
+<section class="slide" data-deck="nexus">
+  <div class="kicker">Business model</div>
+  <h2>Free for people. Paid by those who benefit from healthier people.</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Free core app</h3><p>Logging, risk scores, the coach and plans stay free forever. Because there are no server costs, free is sustainable.</p></div>
+    <div class="card"><h3>B2B wellness licences</h3><p>Employers and health insurers pay per member per year for a white-label version with opt-in, anonymised progress reports.</p></div>
+    <div class="card"><h3>Diagnostic referrals</h3><p>Users who score high on IDRS can book a fasting-glucose or HbA1c test with partner labs; we earn a referral fee.</p></div>
+    <div class="card"><h3>Pro for dietitians</h3><p>A subscription dashboard so dietitians and clinics can give clients ThaliSense plans that they review and adjust.</p></div>
+  </div>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 11. Competitive advantage (nexus) -->
+<section class="slide" data-deck="nexus">
+  <div class="kicker">Competitive advantage</div>
+  <h2>Why ThaliSense wins where general calorie apps don't.</h2>
+  <table>
+    <tr><th></th><th>Typical calorie app</th><th>Paid diet coaching</th><th>ThaliSense</th></tr>
+    <tr><td>Understands Indian dishes &amp; Hinglish</td><td class="n">Partly</td><td class="n">Yes</td><td class="y">Yes, 108 dishes, regional names</td></tr>
+    <tr><td>Indian risk science (IDRS, BMI 23)</td><td class="n">No</td><td class="n">Sometimes</td><td class="y">Built in</td></tr>
+    <tr><td>Explains its reasoning</td><td class="n">No</td><td class="n">Human coach</td><td class="y">Visible agent trace</td></tr>
+    <tr><td>Data stays on your device</td><td class="n">No, cloud</td><td class="n">No, cloud</td><td class="y">Yes, nothing uploaded</td></tr>
+    <tr><td>Cost to the user</td><td class="n">Freemium</td><td class="n">₹ thousands a month</td><td class="y">Free</td></tr>
+    <tr><td>Budget-aware regional plans</td><td class="n">No</td><td class="n">Manual</td><td class="y">Automatic, self-checked</td></tr>
+  </table>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 12. Impact (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Expected impact</div>
+  <h2>Small swaps, caught early, at national scale.</h2>
+  <div class="grid g3" style="margin-bottom: 20px">
+    <div class="card"><div class="big">~1,200</div><p>kcal a week saved by the swaps the coach finds in the demo week, about 0.7 kg of fat a month, with more protein and fibre.</p></div>
+    <div class="card"><div class="big">60+</div><p>IDRS score triggers a clear “get tested” prompt, catching undiagnosed diabetes earlier.</p></div>
+    <div class="card"><div class="big">0</div><p>bytes of health data uploaded. Privacy builds trust, especially for women and older users.</p></div>
+  </div>
+  <ul class="clean">
+    <li>Fights obesity with the food people already eat, <span>not a foreign diet they'll quit in a week.</span></li>
+    <li>Inclusive by design: <span>vegetarian-aware, budget-aware (₹200 a day by default), regional, and runs on low-end phones.</span></li>
+    <li>Scales at near-zero cost: <span>static hosting, on-device AI, works offline.</span></li>
+  </ul>
+  <div class="foot"><span>Wellness guidance, not a medical device</span><span>ThaliSense</span></div>
+</section>
+
+<!-- 13. Future scope (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Future scope</div>
+  <h2>Where ThaliSense goes next.</h2>
+  <div class="grid g2">
+    <ul class="clean">
+      <li>Multi-dish thali detection: <span>segment the plate, then recognise each katori.</span></li>
+      <li>Voice logging <span>in Hindi, Tamil, Bengali and Marathi.</span></li>
+      <li>Progress tracking: <span>weight, waist and HbA1c trends, with goals.</span></li>
+    </ul>
+    <ul class="clean">
+      <li>ASHA-worker mode: <span>offline community IDRS screening and referrals.</span></li>
+      <li>Wearable and glucometer import <span>for steps and glucose response.</span></li>
+      <li>Optional LLM chat, <span>grounded in the agent's trace, with the user's own key.</span></li>
+    </ul>
+  </div>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 14. Close (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="logo">
+    <svg width="56" height="56" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#ff9a3c" stroke-width="2"/><circle cx="11" cy="11" r="3.6" fill="#ff9a3c"/><circle cx="21" cy="11" r="3.6" fill="#5fd38d"/><circle cx="11" cy="21" r="3.6" fill="#f5c451"/><circle cx="21" cy="21" r="4.2" fill="none" stroke="#f4efe7" stroke-width="1.6"/></svg>
+    ThaliSense
+  </div>
+  <div style="margin: auto 0">
+    <h1 style="font-size: 64px">Try it now.</h1>
+    <p class="lede" style="margin-top: 20px">Open the link on any phone and press <b style="color: var(--t)">Try with a demo week</b>.</p>
+    <div class="grid g2" style="margin-top: 36px; max-width: 980px">
+      <div class="card"><p>Live app</p><h3 class="a" style="font-size: 30px; margin-top: 6px">thalisense.vercel.app</h3></div>
+      <div class="card"><p>Source code</p><h3 class="a" style="font-size: 26px; margin-top: 6px">github.com/andringodson/ThaliSense</h3></div>
+    </div>
+  </div>
+  <div class="foot"><span>Andrin Godson</span><span>Thank you</span></div>
+</section>
+
+<script>
+  const deck = (location.hash.slice(1) || 'shakti').toLowerCase()
+  for (const s of document.querySelectorAll('[data-deck]')) {
+    if (s.dataset.deck.split(' ').includes(deck)) s.style.display = 'flex'
+  }
+  for (const el of document.querySelectorAll('.shakti-only')) if (deck !== 'shakti') el.remove()
+  for (const el of document.querySelectorAll('.nexus-only')) if (deck !== 'nexus') el.remove()
+</script>
+</body>
+</html>

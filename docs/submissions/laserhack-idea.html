@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ThaliSense: LaserHack 2026 idea submission</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 14mm 15mm; }
+  * { box-sizing: border-box; }
+  body { font: 9.6pt/1.45 Inter, sans-serif; color: #1d1a16; margin: 0; }
+  h1, h2 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; margin: 0; }
+  h1 { font-size: 22pt; line-height: 1.05; }
+  h2 { font-size: 11.5pt; color: #c25e00; margin: 12px 0 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  p { margin: 0 0 6px; }
+  ul { margin: 0 0 6px; padding-left: 16px; }
+  li { margin-bottom: 3px; }
+  b { font-weight: 600; }
+  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #e8730c; padding-bottom: 8px; margin-bottom: 8px; }
+  .tag { font-size: 8.5pt; color: #6f675d; text-align: right; line-height: 1.5; }
+  .sub { font-size: 11pt; color: #6f675d; margin-top: 4px; }
+  .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0 2px; }
+  .meta div { background: #f6f0e7; border-radius: 6px; padding: 5px 8px; font-size: 8.3pt; }
+  .meta b { display: block; font-size: 7.5pt; text-transform: uppercase; color: #6f675d; letter-spacing: 0.05em; font-weight: 600; }
+  .stat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 8px; }
+  .stat div { border: 1px solid #e7dfd3; border-radius: 6px; padding: 6px 8px; }
+  .stat b { display: block; font-family: 'Space Grotesk'; font-size: 15pt; color: #e8730c; line-height: 1.1; }
+  .stat span { font-size: 8pt; color: #6f675d; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.6pt; margin-bottom: 6px; }
+  td, th { text-align: left; padding: 4px 6px; border-bottom: 1px solid #ece4d8; vertical-align: top; }
+  th { font-size: 7.6pt; text-transform: uppercase; letter-spacing: 0.05em; color: #6f675d; font-weight: 600; }
+  .shots { display: grid; grid-template-columns: 1.15fr 1fr; gap: 8px; margin: 6px 0 4px; }
+  .shots img { width: 100%; border-radius: 6px; border: 1px solid #e7dfd3; display: block; }
+  .cap { font-size: 7.5pt; color: #6f675d; margin-top: 2px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 8pt; margin: 4px 0 6px; }
+  .flow span { background: #1d1a16; color: #fff; padding: 2px 7px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 7.6pt; }
+  .flow i { color: #c25e00; font-style: normal; }
+  .page-break { break-before: page; }
+  .links { background: #1d1a16; color: #f4efe7; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; font-size: 8.8pt; margin-top: 8px; }
+  .links a { color: #ff9a3c; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div>
+      <h1>ThaliSense</h1>
+      <div class="sub">An on-device AI nutrition &amp; metabolic-health coach built for Indian meals</div>
+    </div>
+    <div class="tag">2nd LaserHack 2026 · Round 1: Idea Submission<br />Theme: <b>HealthTech</b> (with Artificial Intelligence)</div>
+  </div>
+
+  <div class="meta">
+    <div><b>Theme</b>HealthTech + AI</div>
+    <div><b>Stage</b>Working MVP, live</div>
+    <div><b>Runs on</b>Any phone browser</div>
+    <div><b>Cost to user</b>Free, no sign-up</div>
+  </div>
+
+  <h2>1 · Problem statement</h2>
+  <div class="stat">
+    <div><b>101 M</b><span>Indians living with diabetes (ICMR-INDIAB, Lancet D&amp;E 2023)</span></div>
+    <div><b>136 M</b><span>more with prediabetes, most of them undiagnosed</span></div>
+    <div><b>BMI 23</b><span>is where overweight starts for Asian Indians, not 25</span></div>
+  </div>
+  <p>India's diabetes and obesity epidemic is driven by everyday food: large portions of white rice, refined flour, fried snacks and sweet chai. Yet the tools people have do not fit them:</p>
+  <ul>
+    <li><b>Food apps are built for Western diets.</b> They don't know <i>pesarattu</i>, <i>bisi bele bath</i> or <i>kadhi</i>, and can't understand “do roti aur dahi” or “rendu dosai”.</li>
+    <li><b>Risk is mis-measured.</b> South Asians develop diabetes at a lower body weight and with more belly fat, so global BMI cut-offs reassure people who are already at risk.</li>
+    <li><b>Generic advice fails.</b> “Eat less rice” doesn't stick. Swaps for foods people already eat, in their own regional cuisine and within their budget, do.</li>
+    <li><b>Privacy and cost.</b> Many users won't upload meal photos and health data to a server, or pay for a dietitian.</li>
+  </ul>
+
+  <h2>2 · Proposed solution</h2>
+  <p><b>ThaliSense</b> is a free web app that turns what people already eat into a personal, explainable plan. Everything, including the AI, runs inside the user's browser.</p>
+  <div class="two">
+    <ul>
+      <li><b>Log by typing, in your own words.</b> A meal parser covering 108 Indian dishes understands quantities, Hindi and Tamil number words, regional names, plurals and typos.</li>
+      <li><b>Log by photo.</b> A CLIP vision-language model runs on the device, shortlists the dish and suggests the usual sides (idli → sambar, chutney). The user confirms with one tap.</li>
+      <li><b>Know your real risk.</b> The validated <b>Indian Diabetes Risk Score</b> (MDRF), BMI with <b>Asian Indian cut-offs</b>, and waist-to-height ratio, with clear advice to get tested when the risk is high.</li>
+    </ul>
+    <ul>
+      <li><b>An explainable coach agent.</b> It reviews the past week, finds the biggest problems (carb-heavy plates, low protein, sugary drinks), and proposes swaps with the weekly calorie, protein and fibre impact of each.</li>
+      <li><b>A self-checking 7-day plan.</b> Regional menus (South, North, East, West; veg, egg or non-veg) within a ₹/day budget. The agent verifies every day against the targets and repairs any misses, and every step is shown to the user.</li>
+      <li><b>Private by design.</b> No account and no server: data stays on the phone.</li>
+    </ul>
+  </div>
+
+  <h2>Unique features</h2>
+  <table>
+    <tr><th>What</th><th>Why it is different</th></tr>
+    <tr><td>Indian-first food intelligence</td><td>108 dishes with IFCT-2017-based nutrition, GI band, regional tags and rupee cost; 60 real meal templates instead of random food combinations.</td></tr>
+    <tr><td>On-device vision AI</td><td>Dish text embeddings are precomputed at build time, so the phone downloads only the vision encoder once and recognises a photo in about 1 second, offline afterwards.</td></tr>
+    <tr><td>Transparent agent, not a black box</td><td>Eight traceable tool steps (assess → review → detect → swap → plan → verify → budget → habits). It never invents numbers.</td></tr>
+    <tr><td>Clinically grounded</td><td>MDRF IDRS, Asian BMI consensus (Misra 2009), Mifflin-St Jeor, ICMR-NIN 2024 dietary guidelines.</td></tr>
+  </table>
+
+  <div class="page-break"></div>
+
+  <div class="shots">
+    <div><img src="../screenshots/coach.png" alt="Coach agent trace" /><div class="cap">The coach agent's visible reasoning trace and 7-day intake chart.</div></div>
+    <div><img src="../screenshots/snap.png" alt="Photo recognition" /><div class="cap">On-device dish recognition with suggested side dishes.</div></div>
+  </div>
+
+  <h2>3 · Technology stack</h2>
+  <div class="flow">
+    <span>Typed meal</span><i>→</i><span>parser</span><i>·</i><span>Photo</span><i>→</i><span>CLIP ViT-B/32 (WASM worker)</span><i>→</i><span>meal log (on device)</span><i>→</i><span>coach agent</span><i>→</i><span>insights · swaps · plan</span>
+  </div>
+  <table>
+    <tr><th>Layer</th><th>Choice</th></tr>
+    <tr><td>Front end</td><td>React 19, TypeScript, Vite; responsive, works on low-end Android browsers; dark and light themes</td></tr>
+    <tr><td>AI / ML</td><td>Transformers.js on ONNX Runtime Web; CLIP ViT-B/32 (int8 quantised, 89 MB, cached); prompt-ensembled dish embeddings (76 KB)</td></tr>
+    <tr><td>Agent &amp; logic</td><td>Deterministic tool-based planner in TypeScript: template scoring, portion scaling, verify-and-repair loop, budget check</td></tr>
+    <tr><td>Data</td><td>IFCT 2017 (ICMR-NIN) based food table; IDRS, Asian BMI and ICMR-NIN 2024 rules</td></tr>
+    <tr><td>Quality &amp; hosting</td><td>Vitest unit tests, Playwright end-to-end tests, GitHub Actions CI, Vercel static hosting. No backend and no paid APIs.</td></tr>
+  </table>
+
+  <h2>4 · Real-world impact &amp; feasibility</h2>
+  <div class="two">
+    <div>
+      <p><b>Impact</b></p>
+      <ul>
+        <li><b>Earlier detection.</b> IDRS flags high-risk people (score of 60 or more) and pushes them to a cheap fasting-glucose or HbA1c test.</li>
+        <li><b>Measurable change.</b> On the demo week the coach finds swaps worth about 1,200 kcal a week (around 0.7 kg of fat a month) while raising protein and fibre.</li>
+        <li><b>Inclusive.</b> Regional, vegetarian-aware and budget-aware (default ₹200 a day), in the words people actually use.</li>
+        <li><b>Scales to the public system.</b> An ASHA-worker mode could screen whole villages offline on one phone.</li>
+      </ul>
+    </div>
+    <div>
+      <p><b>Feasibility</b></p>
+      <ul>
+        <li><b>Already working.</b> A live MVP with typed and photo logging, risk scoring, the coach agent and 7-day plans.</li>
+        <li><b>Near-zero running cost.</b> Static hosting; all compute happens on users' devices, so a million users cost the same as ten.</li>
+        <li><b>Measured accuracy.</b> 70% top-1 and 80% top-3 dish recognition on 30 real photos; the user always confirms.</li>
+        <li><b>Next (Round 2).</b> Detecting several dishes on one thali, Hindi and Tamil voice logging, and a progress dashboard.</li>
+      </ul>
+    </div>
+  </div>
+  <p style="font-size:8pt;color:#6f675d;margin-top:4px">ThaliSense is a wellness guide, not a medical device. It does not diagnose; it encourages users at high risk to get tested.</p>
+
+  <div class="links">
+    <span>Live MVP: <a href="https://thalisense.vercel.app">thalisense.vercel.app</a></span>
+    <span>Code: <a href="https://github.com/andringodson/ThaliSense">github.com/andringodson/ThaliSense</a></span>
+  </div>
+</body>
+</html>
