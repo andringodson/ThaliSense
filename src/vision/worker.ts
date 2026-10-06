@@ -149,7 +149,7 @@ self.onmessage = async (e: MessageEvent<VisionRequest>) => {
     const found = new Map<string, number>()
     for (const r of await regions(image)) {
       const best = rank(await embed(m, r))[0]
-      if (best.p >= 0.3 && !top.has(best.foodId)) found.set(best.foodId, Math.max(best.p, found.get(best.foodId) ?? 0))
+      if (best.p >= 0.2 && !top.has(best.foodId)) found.set(best.foodId, Math.max(best.p, found.get(best.foodId) ?? 0))
     }
     post({
       type: 'regions',
