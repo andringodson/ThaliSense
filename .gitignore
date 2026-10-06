@@ -34,3 +34,5 @@ playwright-report/
 dist-emulator/
 firebase-debug.log
 firestore-debug.log
+# The emulator test build uses demo- values only, never real credentials.
+!.env.emulator
