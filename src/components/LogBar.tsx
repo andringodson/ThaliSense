@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { FOOD_BY_ID } from '../data/foods'
 import { parseMeal } from '../lib/parser'
 import { MEALS, type Meal } from '../lib/nutrition'
+import { warmup } from '../vision/client'
 import { Icon, qtyLabel } from './ui'
 
 const EXAMPLES = ['3 idli, sambar and coffee', '2 roti, dal, bhindi, curd', 'chicken biryani with raita', 'do paratha aur dahi', '1.5 cup rice, rasam, poriyal']
@@ -47,7 +48,7 @@ export function LogBar({ meal, onMeal, onAdd, onSnap }: {
           autoComplete="off"
           enterKeyHint="done"
         />
-        <button type="button" className="icon-btn" onClick={onSnap} aria-label="Log from a photo" title="Snap your thali">
+        <button type="button" className="icon-btn" onClick={onSnap} onPointerEnter={warmup} onFocus={warmup} onTouchStart={warmup} aria-label="Log from a photo" title="Snap your thali">
           <Icon name="camera" />
         </button>
         <button type="submit" className="btn primary" disabled={!parsed.items.length}>

@@ -37,10 +37,10 @@ const COMPANIONS: Record<string, string[]> = {
   pakora: ['chai'],
 }
 
-/** Downscale big phone photos before inference; CLIP only sees 224 px anyway. */
+/** Downscale big phone photos before inference; the model only sees 256 px, and regions are 60% crops. */
 async function shrink(file: Blob): Promise<Blob> {
   const bmp = await createImageBitmap(file)
-  const scale = Math.min(1, 640 / Math.max(bmp.width, bmp.height))
+  const scale = Math.min(1, 560 / Math.max(bmp.width, bmp.height))
   const canvas = new OffscreenCanvas(Math.round(bmp.width * scale), Math.round(bmp.height * scale))
   canvas.getContext('2d')!.drawImage(bmp, 0, 0, canvas.width, canvas.height)
   return canvas.convertToBlob({ type: 'image/jpeg', quality: 0.9 })

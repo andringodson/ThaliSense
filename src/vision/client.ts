@@ -48,9 +48,28 @@ export function onProgress(fn: (p: Progress) => void) {
   return () => progressListeners.delete(fn)
 }
 
-/** Start downloading the model before the user needs it. */
+let warmed = false
+
+/** Start downloading and compiling the model before the user needs it. */
 export function warmup() {
+  if (warmed) return
+  warmed = true
   get().postMessage({ type: 'warmup' } satisfies VisionRequest)
+}
+
+type NetInfo = { saveData?: boolean; effectiveType?: string; type?: string }
+
+/**
+ * On a fast, unmetered connection, fetch the model in the background once the
+ * page is idle, so the first photo answers in about half a second instead of
+ * waiting for a 72 MB download. On mobile data or Save-Data, wait for intent.
+ */
+export function prefetchIfFast() {
+  const c = (navigator as Navigator & { connection?: NetInfo }).connection
+  if (!c || c.saveData || c.effectiveType !== '4g' || c.type === 'cellular') return
+  const go = () => warmup()
+  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 8000 })
+  else setTimeout(go, 4000)
 }
 
 /**

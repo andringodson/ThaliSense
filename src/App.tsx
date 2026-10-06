@@ -1,8 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Coach } from './components/Coach'
-import { Health } from './components/Health'
-import { Plan } from './components/Plan'
-import { SnapSheet } from './components/SnapSheet'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { Today } from './components/Today'
 import { Icon } from './components/ui'
 import { runCoach, type CoachReport } from './lib/agent'
@@ -10,7 +6,26 @@ import { demoLogs, demoMeasures } from './lib/demo'
 import { DEFAULT_PROFILE, assess, type Measure, type Profile } from './lib/health'
 import { isoDate, mealForHour, uid, type LogEntry, type Meal } from './lib/nutrition'
 import { useInstallPrompt } from './lib/pwa'
+import { prefetchIfFast } from './vision/client'
 import { usePersistent } from './lib/store'
+
+// Only Today is needed for the first paint; the other screens load on demand.
+const Coach = lazy(() => import('./components/Coach').then((m) => ({ default: m.Coach })))
+const Plan = lazy(() => import('./components/Plan').then((m) => ({ default: m.Plan })))
+const Health = lazy(() => import('./components/Health').then((m) => ({ default: m.Health })))
+const SnapSheet = lazy(() => import('./components/SnapSheet').then((m) => ({ default: m.SnapSheet })))
+
+/** Warm the other screens' code once the browser is idle, so tab switches are instant. */
+function prefetchScreens() {
+  const go = () => {
+    void import('./components/Coach')
+    void import('./components/Plan')
+    void import('./components/Health')
+    void import('./components/SnapSheet')
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 })
+  else setTimeout(go, 1500)
+}
 
 type Tab = 'today' | 'coach' | 'plan' | 'me'
 const TABS: { id: Tab; label: string; icon: 'today' | 'coach' | 'plan' | 'me' }[] = [
@@ -68,6 +83,10 @@ export default function App() {
     return TABS.some((x) => x.id === t) ? (t as Tab) : 'today'
   })
   const install = useInstallPrompt()
+  useEffect(() => {
+    prefetchScreens()
+    prefetchIfFast()
+  }, [])
   const [meal, setMeal] = useState<Meal>(mealForHour(new Date().getHours()))
   const [snap, setSnap] = useState(false)
   const [report, setReport] = useState<CoachReport | null>(null)
@@ -127,6 +146,7 @@ export default function App() {
       </nav>
 
       <main className="main">
+        <Suspense fallback={<div className="screen-loading" aria-busy="true" />}>
         {tab === 'today' && (
           <Today
             profile={profile}
@@ -158,9 +178,14 @@ export default function App() {
             onClear={() => { setProfile(null); setLogs([]); setMeasures([]); setReport(null) }}
           />
         )}
+        </Suspense>
       </main>
 
-      {snap && <SnapSheet meal={meal} diet={profile.diet} onClose={closeSnap} onAdd={(items, src) => add(items, src)} />}
+      {snap && (
+        <Suspense fallback={null}>
+          <SnapSheet meal={meal} diet={profile.diet} onClose={closeSnap} onAdd={(items, src) => add(items, src)} />
+        </Suspense>
+      )}
     </div>
   )
 }

@@ -12,8 +12,8 @@
   --watch: #f5c451;
   --high: #ff6b5e;
   --radius: 16px;
-  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --display: 'Space Grotesk', var(--font);
+  --font: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display: 'Space Grotesk Variable', 'Space Grotesk', var(--font);
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
 }
@@ -107,6 +107,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .nav .install { align-self: flex-start; }
 .nav-foot { margin-top: auto; display: flex; align-items: center; gap: 6px; }
 .main { min-width: 0; padding: 28px clamp(16px, 3vw, 40px) 48px; }
+.screen-loading { min-height: 60vh; }
 .screen { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .screen-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
 .head-chips, .head-stats { display: flex; gap: 8px; flex-wrap: wrap; }

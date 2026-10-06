@@ -2,11 +2,9 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// Same isolation headers as production (vercel.json), so WASM threads work locally too.
-const isolation = {
-  'Cross-Origin-Opener-Policy': 'same-origin',
-  'Cross-Origin-Embedder-Policy': 'credentialless',
-}
+// Same isolation header as production (vercel.json): cross-origin isolation for
+// multi-threaded WASM, without COOP, so sign-in popups keep working.
+const isolation = { 'Document-Isolation-Policy': 'isolate-and-credentialless' }
 
 // https://vite.dev/config/
 export default defineConfig({

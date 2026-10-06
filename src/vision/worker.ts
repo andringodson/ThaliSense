@@ -21,6 +21,9 @@ import labels from './labels.json'
  */
 
 env.allowLocalModels = false
+// More WASM threads cut the five-region thali pass by about a quarter
+// (measured: 2.47 s at 4 threads, 1.87 s at 8). Leave two cores for the page.
+if (env.backends.onnx.wasm) env.backends.onnx.wasm.numThreads = Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 4) - 2))
 
 export type Score = { foodId: string; p: number }
 export type VisionRequest = { type: 'classify'; id: number; image: Blob; thali: boolean } | { type: 'warmup' }
