@@ -125,7 +125,7 @@
   <div class="kicker">Working MVP · live today</div>
   <h2 style="margin-bottom: 20px">From a photo of your thali to a week of better meals.</h2>
   <div class="grid g3" style="gap: 14px">
-    <div><img class="shot" src="../screenshots/snap.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Snap: dish recognised on the device in about 1 second, with usual sides suggested.</p></div>
+    <div><img class="shot" src="../screenshots/snap.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Snap a whole thali: the AI scans the plate and ticks every dish it finds, on the device.</p></div>
     <div><img class="shot" src="../screenshots/coach.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Coach: an 8-step agent trace you can follow, plus insights and swaps.</p></div>
     <div><img class="shot" src="../screenshots/plan.png" style="height: 300px" /><p class="m" style="margin-top: 10px; font-size: 16px">Plan: 7 regional days within budget, with notes on what the coach adjusted.</p></div>
   </div>
@@ -139,10 +139,10 @@
   <div class="grid g3">
     <div class="card"><h3>Indian-first food data</h3><p>108 dishes with IFCT-2017-based nutrition, GI band and rupee cost; Hindi, Tamil and regional names.</p></div>
     <div class="card"><h3>Natural-language logging</h3><p>Quantities, “do / rendu / aadha”, plurals, typos and compound dishes like curd rice.</p></div>
-    <div class="card"><h3>Photo recognition</h3><p>CLIP vision model on the device; 80% top-3 accuracy on real photos, and the user confirms.</p></div>
+    <div class="card"><h3>Photo recognition</h3><p>Fine-tuned on-device vision model: 87.8% top-1, 95% top-3 on 1,694 photos, and it reads whole thalis.</p></div>
     <div class="card"><h3>Clinical risk scores</h3><p>MDRF Indian Diabetes Risk Score, Asian BMI, waist-to-height ratio, with a prompt to get tested if at high risk.</p></div>
     <div class="card"><h3>Explainable agent</h3><p>Shows each step it takes, swaps foods with measured weekly impact, and verifies and repairs its own plan.</p></div>
-    <div class="card"><h3>Private and offline</h3><p>No account and no server; works offline once loaded, and costs nothing to run per user.</p></div>
+    <div class="card"><h3>Private, offline, installable</h3><p>No account and no server; installs like an app, works offline, and costs nothing to run per user.</p></div>
   </div>
   <div class="foot"><span></span><span>ThaliSense</span></div>
 </section>
@@ -153,16 +153,34 @@
   <h2>Real AI, running entirely on the user's phone.</h2>
   <div class="flow" style="margin-bottom: 26px">
     <div class="n"><code>input</code>Typed meal / photo</div><span class="arr">→</span>
-    <div class="n"><code>parser · CLIP ViT-B/32</code>Dish recognition</div><span class="arr">→</span>
+    <div class="n"><code>parser · MobileCLIP-S2</code>Dish recognition</div><span class="arr">→</span>
     <div class="n"><code>localStorage</code>Meal log</div><span class="arr">→</span>
     <div class="n"><code>coach agent</code>8 tool steps</div><span class="arr">→</span>
     <div class="n"><code>output</code>Insights · swaps · plan</div>
   </div>
   <div class="grid g2">
-    <div class="card"><h3>Vision: zero-shot CLIP in the browser</h3><p>Transformers.js on ONNX Runtime Web (WASM) in a Web Worker. Dish text embeddings are precomputed at build time with prompt ensembling, so the phone downloads only the 89 MB int8 vision encoder once and classifies a photo in about 1 second.</p></div>
+    <div class="card"><h3>Vision: fine-tuned MobileCLIP on the phone</h3><p>Transformers.js on ONNX Runtime Web, WebGPU or 4-thread WASM, in a Web Worker. One vector per dish from descriptive prompts, few-shot adapted on 2,354 labelled photos. The 72 MB encoder downloads once; a second pass scans five plate regions to find every dish on a thali.</p></div>
     <div class="card"><h3>Agent: plan, verify, repair</h3><p>A tool-based planner: <span class="num a">assess → review → detect → swap → plan → verify → budget → habits</span>. It scores 60 real meal templates on protein, fibre, glycaemic load, cost and region, scales the staples, then checks every day against the targets and fixes the misses.</p></div>
   </div>
-  <p class="m" style="margin-top: 20px; font-size: 16px">React 19 · TypeScript · Vite · Transformers.js · ONNX Runtime Web · Vitest · Playwright · GitHub Actions · Vercel · no backend, no paid APIs</p>
+  <p class="m" style="margin-top: 20px; font-size: 16px">React 19 · TypeScript · Vite · Transformers.js · ONNX Runtime Web · Vitest · Playwright + axe · GitHub Actions · Vercel · PWA · no backend, no paid APIs</p>
+  <div class="foot"><span></span><span>ThaliSense</span></div>
+</section>
+
+<!-- 7b. Measured (both) -->
+<section class="slide" data-deck="shakti nexus">
+  <div class="kicker">Measured, not guessed</div>
+  <h2>We benchmarked four vision models and fine-tuned the best.</h2>
+  <div class="grid g2" style="grid-template-columns: 1.35fr 1fr; align-items: start">
+    <table>
+      <tr><th>Model, on 1,694 test photos</th><th>Size</th><th>Top-1</th><th>Top-3</th></tr>
+      <tr><td>CLIP ViT-B/32 (our v1)</td><td class="n">89 MB</td><td class="n">71.5%</td><td class="n">86.8%</td></tr>
+      <tr><td>CLIP ViT-B/16</td><td class="n">87 MB</td><td class="n">73.6%</td><td class="n">87.9%</td></tr>
+      <tr><td>MobileCLIP-S2</td><td class="n">72 MB</td><td class="n">81.5%</td><td class="n">92.9%</td></tr>
+      <tr><td><b>MobileCLIP-S2, few-shot adapted</b></td><td class="y">72 MB</td><td class="y">87.8%</td><td class="y">95.0%</td></tr>
+    </table>
+    <div class="card"><div class="big">25% → 55%</div><p>of dishes found on 200 four-dish test thalis, by adding a scan of five plate regions to the whole-photo guess.</p></div>
+  </div>
+  <p class="m" style="margin-top: 22px; font-size: 16px">Test photos from three public Indian-food datasets, never used for training or tuning. Full model card: github.com/andringodson/ThaliSense/blob/main/docs/vision.md</p>
   <div class="foot"><span></span><span>ThaliSense</span></div>
 </section>
 
@@ -176,20 +194,20 @@
       <ul class="clean" style="gap: 10px; margin-top: 10px">
         <li style="font-size: 17px">Food data: 108 dishes from IFCT 2017 (ICMR-NIN) with serving sizes and cost</li>
         <li style="font-size: 17px">Risk: MDRF IDRS, Asian BMI consensus, Mifflin-St Jeor, ICMR-NIN 2024</li>
-        <li style="font-size: 17px">Vision: CLIP embeddings precomputed at build time; tested on 30 real photos</li>
-        <li style="font-size: 17px">Agent: template scoring with a verify-and-repair loop; 15 unit tests</li>
-        <li style="font-size: 17px">Shipped: CI on every push, auto-deploy to Vercel</li>
+        <li style="font-size: 17px">Vision: 4 models benchmarked on 1,694 photos; MobileCLIP-S2 few-shot adapted</li>
+        <li style="font-size: 17px">Agent: template scoring with a verify-and-repair loop; 17 unit tests</li>
+        <li style="font-size: 17px">Shipped: 12 end-to-end tests incl. accessibility, CI on every push, auto-deploy</li>
       </ul>
     </div>
     <div class="card">
       <h3>Status &amp; what is new</h3>
-      <p style="margin-top: 8px">Everything shown was built during the hackathon window. No pre-built project code was reused; open-source libraries (React, Transformers.js) and the public CLIP model are credited.</p>
+      <p style="margin-top: 8px">Everything shown was built during the hackathon window. No pre-built project code was reused; open-source libraries (React, Transformers.js), the public MobileCLIP model and public datasets are credited.</p>
       <table style="margin-top: 14px; font-size: 16px">
         <tr><td>Typed logging, 108 dishes</td><td class="y">Live</td></tr>
-        <tr><td>On-device photo recognition</td><td class="y">Live</td></tr>
+        <tr><td>On-device photo and whole-thali recognition</td><td class="y">Live</td></tr>
         <tr><td>Risk scores and targets</td><td class="y">Live</td></tr>
-        <tr><td>Coach agent and 7-day plan</td><td class="y">Live</td></tr>
-        <tr><td>Multi-dish thali, voice in Indian languages</td><td class="n">Next</td></tr>
+        <tr><td>Coach agent, 7-day plan, plate scores, progress</td><td class="y">Live</td></tr>
+        <tr><td>Plate segmentation, voice in Indian languages</td><td class="n">Next</td></tr>
       </table>
     </div>
   </div>
@@ -265,9 +283,9 @@
   <h2>Where ThaliSense goes next.</h2>
   <div class="grid g2">
     <ul class="clean">
-      <li>Multi-dish thali detection: <span>segment the plate, then recognise each katori.</span></li>
+      <li>Plate segmentation: <span>outline each katori, then recognise it, for crowded thalis.</span></li>
       <li>Voice logging <span>in Hindi, Tamil, Bengali and Marathi.</span></li>
-      <li>Progress tracking: <span>weight, waist and HbA1c trends, with goals.</span></li>
+      <li>More dishes adapted: <span>labelled photos for all 108 dishes, then the next 200.</span></li>
     </ul>
     <ul class="clean">
       <li>ASHA-worker mode: <span>offline community IDRS screening and referrals.</span></li>
