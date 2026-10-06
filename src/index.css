@@ -104,6 +104,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .nav-tabs button:hover { color: var(--text); background: var(--surface); }
 .nav-tabs button.on { color: var(--text); background: var(--surface-2); }
 .nav-tabs button.on svg { color: var(--accent); }
+.nav .install { align-self: flex-start; }
 .nav-foot { margin-top: auto; display: flex; align-items: center; gap: 6px; }
 .main { min-width: 0; padding: 28px clamp(16px, 3vw, 40px) 48px; }
 .screen { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
@@ -256,6 +257,17 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .privacy-row svg { color: var(--good); flex: none; }
 .privacy-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* Progress */
+.trends { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.trend-head { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+.trend svg { width: 100%; height: auto; display: block; }
+.trend-line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.trend-dot { fill: var(--accent); }
+.trend-goal { stroke: var(--good); stroke-dasharray: 4 4; stroke-width: 1.2; }
+.trend-goal-label { fill: var(--good); font-size: 10px; font-family: var(--mono); }
+.measure-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+@media (max-width: 480px) { .trends { grid-template-columns: 1fr; } .measure-form { grid-template-columns: 1fr 1fr; } .measure-form .btn { grid-column: 1 / -1; } }
+
 /* Snap sheet */
 .sheet-backdrop { position: fixed; inset: 0; background: rgb(0 0 0 / 0.6); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 50; padding: 16px; animation: fade 160ms; }
 .sheet { width: min(720px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; display: flex; flex-direction: column; animation: rise 220ms cubic-bezier(.2,.8,.2,1); }
@@ -303,7 +315,7 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
     flex-direction: row; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line);
     background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px);
   }
-  .nav .brand, .nav-foot { display: none; }
+  .nav .brand, .nav-foot, .nav .install { display: none; }
   .nav-tabs { flex-direction: row; flex: 1; justify-content: space-around; }
   .nav-tabs button { flex-direction: column; gap: 2px; padding: 6px 10px; font-size: 0.72rem; }
   .nav-tabs button.on { background: none; }

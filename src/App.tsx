@@ -6,9 +6,10 @@ import { SnapSheet } from './components/SnapSheet'
 import { Today } from './components/Today'
 import { Icon } from './components/ui'
 import { runCoach, type CoachReport } from './lib/agent'
-import { demoLogs } from './lib/demo'
-import { DEFAULT_PROFILE, assess, type Profile } from './lib/health'
+import { demoLogs, demoMeasures } from './lib/demo'
+import { DEFAULT_PROFILE, assess, type Measure, type Profile } from './lib/health'
 import { isoDate, mealForHour, uid, type LogEntry, type Meal } from './lib/nutrition'
+import { useInstallPrompt } from './lib/pwa'
 import { usePersistent } from './lib/store'
 
 type Tab = 'today' | 'coach' | 'plan' | 'me'
@@ -61,7 +62,12 @@ function Welcome({ onDemo, onStart }: { onDemo: () => void; onStart: () => void 
 export default function App() {
   const [profile, setProfile] = usePersistent<Profile | null>('ts.profile', null)
   const [logs, setLogs] = usePersistent<LogEntry[]>('ts.logs', [])
-  const [tab, setTab] = useState<Tab>('today')
+  const [measures, setMeasures] = usePersistent<Measure[]>('ts.measures', [])
+  const [tab, setTab] = useState<Tab>(() => {
+    const t = new URLSearchParams(location.search).get('tab')
+    return TABS.some((x) => x.id === t) ? (t as Tab) : 'today'
+  })
+  const install = useInstallPrompt()
   const [meal, setMeal] = useState<Meal>(mealForHour(new Date().getHours()))
   const [snap, setSnap] = useState(false)
   const [report, setReport] = useState<CoachReport | null>(null)
@@ -89,6 +95,7 @@ export default function App() {
   const loadDemo = () => {
     setProfile(DEFAULT_PROFILE)
     setLogs(demoLogs())
+    setMeasures(demoMeasures())
     setReport(null)
     setTab('today')
   }
@@ -111,6 +118,11 @@ export default function App() {
             </button>
           ))}
         </div>
+        {install && (
+          <button className="btn small install" onClick={install}>
+            <Icon name="plus" size={14} /> Install app
+          </button>
+        )}
         <p className="nav-foot muted small"><Icon name="shield" size={14} /> On-device · private</p>
       </nav>
 
@@ -135,9 +147,15 @@ export default function App() {
           <Health
             profile={profile}
             assessment={assessment}
+            measures={measures}
+            onMeasure={(m) => {
+              setMeasures((prev) => [...prev.filter((x) => x.date !== m.date), m].sort((a, b) => a.date.localeCompare(b.date)))
+              setProfile({ ...profile, weightKg: m.weightKg, waistCm: m.waistCm })
+              setReport(null)
+            }}
             onChange={(p) => { setProfile(p); setReport(null) }}
             onDemo={loadDemo}
-            onClear={() => { setProfile(null); setLogs([]); setReport(null) }}
+            onClear={() => { setProfile(null); setLogs([]); setMeasures([]); setReport(null) }}
           />
         )}
       </main>

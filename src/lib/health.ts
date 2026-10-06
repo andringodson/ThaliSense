@@ -147,6 +147,13 @@ export function assess(p: Profile): Assessment {
   }
 }
 
+/** A dated body measurement, logged from the Health screen. */
+export interface Measure {
+  date: string
+  weightKg: number
+  waistCm: number
+}
+
 export const DEFAULT_PROFILE: Profile = {
   name: 'Priya',
   age: 38,

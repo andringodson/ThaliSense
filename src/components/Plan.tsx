@@ -5,6 +5,31 @@ import { Card, Icon, Meter, qtyLabel } from './ui'
 
 const TITLE: Record<Meal, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' }
 
+/** The week as plain text, for WhatsApp or the share sheet. */
+function planText(report: CoachReport): string {
+  const lines = [`*My 7-day meal plan from ThaliSense* (${report.assessment.targets.kcal} kcal a day)`, '']
+  for (const d of report.plan) {
+    lines.push(`*${d.label} ${new Date(d.date + 'T00:00').getDate()}*`)
+    for (const m of d.meals) lines.push(`${TITLE[m.meal]}: ${m.items.map((i) => `${qtyLabel(i.qty)} ${i.food.name}`).join(', ')}`)
+    lines.push('')
+  }
+  lines.push('Made with https://thalisense.vercel.app')
+  return lines.join('\n')
+}
+
+async function sharePlan(report: CoachReport) {
+  const text = planText(report)
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'My ThaliSense meal plan', text })
+      return
+    } catch {
+      // Cancelled or unsupported: fall through to WhatsApp.
+    }
+  }
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener')
+}
+
 export function Plan({ report, onLog }: { report: CoachReport; onLog: (items: { foodId: string; qty: number }[], source: LogEntry['source'], meal: Meal) => void }) {
   const [day, setDay] = useState(0)
   const [logged, setLogged] = useState<Set<string>>(new Set())
@@ -24,6 +49,7 @@ export function Plan({ report, onLog }: { report: CoachReport; onLog: (items: { 
           <span>{avg('kcal')} kcal/day</span>
           <span>{avg('protein')} g protein</span>
           <span className={weekCost > weekBudget ? 'warn-text' : 'good-text'}>₹{weekCost} / ₹{weekBudget} week</span>
+          <button className="btn small" onClick={() => sharePlan(report)}><Icon name="arrow" size={14} /> Share plan</button>
         </div>
       </header>
 

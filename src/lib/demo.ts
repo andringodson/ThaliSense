@@ -1,4 +1,5 @@
-import { daysBack, uid, type LogEntry, type Meal } from './nutrition'
+import type { Measure } from './health'
+import { daysBack, isoDate, uid, type LogEntry, type Meal } from './nutrition'
 
 /*
  * A realistic week for the demo profile (Priya, 38, Chennai, vegetarian):
@@ -56,4 +57,14 @@ export function demoLogs(today: Date = new Date()): LogEntry[] {
         .map(([foodId, qty]) => ({ id: uid(), date: dates[i], meal, foodId, qty, source: 'manual' as const })),
     ),
   )
+}
+
+/** Five weekly weigh-ins ending today: steady progress since Priya started. */
+export function demoMeasures(today: Date = new Date()): Measure[] {
+  const points: [number, number][] = [[74.4, 95], [73.9, 94.5], [73.3, 93.5], [72.6, 93], [72, 92]]
+  return points.map(([weightKg, waistCm], i) => {
+    const d = new Date(today)
+    d.setDate(d.getDate() - 7 * (points.length - 1 - i))
+    return { date: isoDate(d), weightKg, waistCm }
+  })
 }
