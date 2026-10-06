@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { FOOD_BY_ID, allowed, type Diet } from '../data/foods'
 import type { Meal } from '../lib/nutrition'
-import { classify, isReady, onProgress, warmup, type Progress } from '../vision/client'
+import { backend, classify, isReady, onProgress, warmup, type Progress } from '../vision/client'
 import { Icon, Stepper } from './ui'
 
-type Candidate = { foodId: string; p: number; on: boolean; qty: number; companion?: boolean }
+type Candidate = { foodId: string; p: number; on: boolean; qty: number; kind: 'photo' | 'region' | 'companion' }
 
-// CLIP names one dish per photo, so offer what usually shares the plate.
+// What usually shares the plate, offered unticked after the recognised dishes.
 const COMPANIONS: Record<string, string[]> = {
   idli: ['sambar', 'coconut-chutney'],
   dosa: ['sambar', 'coconut-chutney'],
@@ -58,7 +58,9 @@ export function SnapSheet({ meal, diet, onClose, onAdd }: {
   const [error, setError] = useState<string | null>(null)
   const [cands, setCands] = useState<Candidate[]>([])
   const [ms, setMs] = useState<number | null>(null)
+  const [scanning, setScanning] = useState(false)
   const input = useRef<HTMLInputElement>(null)
+  const runId = useRef(0)
 
   useEffect(() => {
     const off = onProgress(setProgress)
@@ -72,28 +74,52 @@ export function SnapSheet({ meal, diet, onClose, onAdd }: {
   }, [onClose])
 
   const run = async (file: Blob) => {
+    const id = ++runId.current
     setError(null)
     setCands([])
     setPreview(URL.createObjectURL(file))
     setBusy(true)
+    setScanning(false)
     try {
-      const { scores, ms } = await classify(await shrink(file))
+      const { scores, ms } = await classify(await shrink(file), (found) => {
+        if (id !== runId.current) return
+        setScanning(false)
+        // Dishes a region of the plate was confident about: insert them before the "often with" suggestions.
+        setCands((prev) => {
+          const seen = new Set(prev.filter((c) => c.kind !== 'companion').map((c) => c.foodId))
+          const usable = found.filter((f) => allowed(FOOD_BY_ID[f.foodId], diet))
+          // Two or more dishes in different parts of the plate means a thali:
+          // trust the regions, and untick whole-photo guesses no region backs up.
+          const thali = usable.length >= 2
+          const extra: Candidate[] = usable
+            .filter((f) => !seen.has(f.foodId))
+            .map((f) => ({ foodId: f.foodId, p: f.p, on: f.p >= (thali ? 0.45 : 0.6), qty: 1, kind: 'region' }))
+          const extraIds = new Set(extra.map((c) => c.foodId))
+          const kept = prev
+            .filter((c) => c.kind !== 'companion')
+            .map((c) => (thali && c.kind === 'photo' && c.p < 0.5 ? { ...c, on: false } : c))
+          const companions = prev.filter((c) => c.kind === 'companion' && !extraIds.has(c.foodId))
+          return thali ? [...extra, ...kept, ...companions] : [...kept, ...extra, ...companions]
+        })
+      })
+      if (id !== runId.current) return
       setMs(ms)
+      setScanning(true)
       // Keep likely dishes the user can eat; pre-tick the confident ones.
       const usable = scores.filter((s) => allowed(FOOD_BY_ID[s.foodId], diet) || s.p > 0.3)
       const top = usable[0]?.p ?? 0
-      const picks: Candidate[] = usable.slice(0, 5).map((s, i) => ({ ...s, on: i === 0 || s.p > top * 0.5, qty: 1 }))
+      const picks: Candidate[] = usable.slice(0, 4).map((s, i) => ({ ...s, on: i === 0 || s.p > top * 0.5, qty: 1, kind: 'photo' }))
       const seen = new Set(picks.map((c) => c.foodId))
-      for (const id of COMPANIONS[picks[0]?.foodId] ?? []) {
-        if (seen.has(id) || !allowed(FOOD_BY_ID[id], diet)) continue
-        seen.add(id)
-        picks.push({ foodId: id, p: 0, on: false, qty: 1, companion: true })
+      for (const fid of COMPANIONS[picks[0]?.foodId] ?? []) {
+        if (seen.has(fid) || !allowed(FOOD_BY_ID[fid], diet)) continue
+        seen.add(fid)
+        picks.push({ foodId: fid, p: 0, on: false, qty: 1, kind: 'companion' })
       }
       setCands(picks)
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      if (id === runId.current) setError(e instanceof Error ? e.message : String(e))
     } finally {
-      setBusy(false)
+      if (id === runId.current) setBusy(false)
     }
   }
 
@@ -121,7 +147,7 @@ export function SnapSheet({ meal, diet, onClose, onAdd }: {
             }}>
             <Icon name="camera" size={36} />
             <b>Take or choose a photo</b>
-            <span className="muted small">Works best with one dish in frame, from above</span>
+            <span className="muted small">A single dish or a whole thali, ideally shot from above</span>
           </button>
         ) : (
           <div className="snap-body">
@@ -147,8 +173,10 @@ export function SnapSheet({ meal, diet, onClose, onAdd }: {
                             <input type="checkbox" checked={c.on} onChange={() => setCands(cands.map((x, j) => (j === i ? { ...x, on: !x.on } : x)))} />
                             <span className="cand-name">{f.name}<span className="muted small"> · {f.serving}</span></span>
                           </label>
-                          {c.companion ? (
+                          {c.kind === 'companion' ? (
                             <span className="conf companion small" title="Usually eaten together">often with</span>
+                          ) : c.kind === 'region' ? (
+                            <span className="conf companion small region" title={`Spotted in part of the plate, ${Math.round(c.p * 100)}% confident`}>on plate</span>
                           ) : (
                             <span className="conf" title="Model confidence">
                               <span className="conf-bar" style={{ width: `${Math.round(c.p * 100)}%` }} />
@@ -160,7 +188,12 @@ export function SnapSheet({ meal, diet, onClose, onAdd }: {
                       )
                     })}
                   </ul>
-                  {ms !== null && <p className="muted small">Ran on this device in {ms} ms. The photo never left your phone.</p>}
+                  {scanning && <p className="muted small scanning">Checking the rest of the plate for more dishes…</p>}
+                  {ms !== null && (
+                    <p className="muted small">
+                      Ran on this device{backend() === 'webgpu' ? ' (GPU)' : ''} in {ms} ms. The photo never left your phone.
+                    </p>
+                  )}
                 </>
               )}
             </div>

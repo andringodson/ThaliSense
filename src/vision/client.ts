@@ -1,13 +1,19 @@
-import type { VisionRequest, VisionResponse } from './worker'
+import type { Score, VisionRequest, VisionResponse } from './worker'
 
+export type { Score }
 export type Progress = { loaded: number; total: number }
-type Pending = { resolve: (s: { foodId: string; p: number }[], ms: number) => void; reject: (e: Error) => void }
+
+type Pending = {
+  resolve: (r: { scores: Score[]; ms: number }) => void
+  reject: (e: Error) => void
+  onRegions?: (found: Score[], ms: number) => void
+}
 
 let worker: Worker | null = null
 let nextId = 1
 const pending = new Map<number, Pending>()
 const progressListeners = new Set<(p: Progress) => void>()
-let ready = false
+let device: string | null = null
 
 function get(): Worker {
   if (worker) return worker
@@ -15,9 +21,13 @@ function get(): Worker {
   worker.onmessage = (e: MessageEvent<VisionResponse>) => {
     const m = e.data
     if (m.type === 'progress') progressListeners.forEach((l) => l({ loaded: m.loaded, total: m.total }))
-    else if (m.type === 'ready') ready = true
+    else if (m.type === 'ready') device = m.device
     else if (m.type === 'result') {
-      pending.get(m.id)?.resolve(m.scores, m.ms)
+      const p = pending.get(m.id)
+      p?.resolve({ scores: m.scores, ms: m.ms })
+      if (!p?.onRegions) pending.delete(m.id)
+    } else if (m.type === 'regions') {
+      pending.get(m.id)?.onRegions?.(m.found, m.ms)
       pending.delete(m.id)
     } else if (m.type === 'error') {
       if (m.id !== undefined) {
@@ -29,7 +39,9 @@ function get(): Worker {
   return worker
 }
 
-export const isReady = () => ready
+export const isReady = () => device !== null
+/** 'webgpu', 'wasm-threads' or 'wasm' once the model has loaded. */
+export const backend = () => device
 
 export function onProgress(fn: (p: Progress) => void) {
   progressListeners.add(fn)
@@ -41,10 +53,15 @@ export function warmup() {
   get().postMessage({ type: 'warmup' } satisfies VisionRequest)
 }
 
-export function classify(image: Blob): Promise<{ scores: { foodId: string; p: number }[]; ms: number }> {
+/**
+ * Recognise the dish in a photo. Resolves with the whole-photo ranking; when
+ * `onRegions` is given, also scans regions of the plate and reports extra
+ * dishes found there.
+ */
+export function classify(image: Blob, onRegions?: (found: Score[], ms: number) => void): Promise<{ scores: Score[]; ms: number }> {
   const id = nextId++
   return new Promise((resolve, reject) => {
-    pending.set(id, { resolve: (scores, ms) => resolve({ scores, ms }), reject })
-    get().postMessage({ type: 'classify', id, image } satisfies VisionRequest)
+    pending.set(id, { resolve, reject, onRegions })
+    get().postMessage({ type: 'classify', id, image, thali: !!onRegions } satisfies VisionRequest)
   })
 }

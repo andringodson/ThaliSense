@@ -30,17 +30,43 @@ function mean(vs: Float32Array[]): Float32Array {
   return m
 }
 
-/** Adapt the text vectors of the dishes in `examples` (food index → image vectors). */
-export function adapt(T: Float32Array[], examples: Map<number, Float32Array[]>, lambda: number): Float32Array[] {
-  if (!examples.size || lambda === 0) return T
+export interface Adapted {
+  vecs: Float32Array[]
+  /** Subtracted from each dish's similarity; zero for dishes without examples. */
+  bias: number[]
+}
+
+export const unadapted = (T: Float32Array[]): Adapted => ({ vecs: T, bias: T.map(() => 0) })
+
+const dotp = (a: Float32Array, b: Float32Array) => {
+  let s = 0
+  for (let i = 0; i < a.length; i++) s += a[i] * b[i]
+  return s
+}
+
+/**
+ * Adapt the text vectors of the dishes in `examples` (food index → image vectors).
+ * With `calibrate`, each adapted dish also gets a bias equal to how much its
+ * similarity to photos of *other* dishes went up, so it gains on its own
+ * photos without pulling in everyone else's.
+ */
+export function adapt(T: Float32Array[], examples: Map<number, Float32Array[]>, lambda: number, calibrate = true): Adapted {
+  if (!examples.size || lambda === 0) return unadapted(T)
   const cents = new Map([...examples].map(([c, vs]) => [c, normalize(mean(vs))]))
   const g = mean([...cents.keys()].map((c) => T[c].map((x, j) => x - cents.get(c)![j])))
-  return T.map((t, c) => {
+  const vecs = T.map((t, c) => {
     const mu = cents.get(c)
     if (!mu) return t
     const shifted = normalize(mu.map((x, j) => x + g[j]))
     return normalize(t.map((x, j) => (1 - lambda) * x + lambda * shifted[j]))
   })
+  const bias = T.map((t, c) => {
+    if (!calibrate || !cents.has(c)) return 0
+    const others = [...examples].filter(([k]) => k !== c).flatMap(([, vs]) => vs)
+    if (!others.length) return 0
+    return others.reduce((s, x) => s + dotp(x, vecs[c]) - dotp(x, t), 0) / others.length
+  })
+  return { vecs, bias }
 }
 
 export function group(entries: Entry[], vecs: Float32Array[]) {

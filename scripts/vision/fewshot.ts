@@ -22,13 +22,13 @@
  */
 import { writeFileSync } from 'node:fs'
 import { FOODS } from '../../src/data/foods'
-import { TEACHES, adapt, group, idx } from './adapt'
+import { TEACHES, adapt, group, idx, unadapted, type Adapted } from './adapt'
 import { accuracy, arg, foodTextEmbeddings, loadManifest, type Entry } from './lib'
 import { MODELS, dot, embedImages, normalize } from './models'
 
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`
 
-const scoreWith = (T: Float32Array[]) => (imgs: Float32Array[]) => imgs.map((v) => T.map((t) => dot(v, t)))
+const scoreWith = (A: Adapted) => (imgs: Float32Array[]) => imgs.map((v) => A.vecs.map((t, c) => dot(v, t) - A.bias[c]))
 
 async function main() {
   const model = arg('model', 'mobileclip-s2')
@@ -63,37 +63,40 @@ async function main() {
   const teachesAny = (e: Entry, set: number[]) => (TEACHES[e.label] ?? []).some((id) => set.includes(idx.get(id)!))
 
   console.log(`${model}${tta ? ' + flip TTA' : ''}: ${classes.length} dishes with examples, ${fitE.length} fit / ${valE.length} validation photos`)
-  let best = { lambda: 0, score: -1 }
-  for (const lambda of [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]) {
-    let total = 0
+  let best = { lambda: 0, calibrate: false, score: -1 }
+  for (const calibrate of [false, true])
+  for (const lambda of [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]) {
+    let total = 0, sumA = 0, sumB = 0
     for (const [adapted, held] of [halves, [halves[1], halves[0]]]) {
-      const Tl = adapt(T, new Map([...fitGroups].filter(([c]) => adapted.includes(c))), lambda)
+      const Tl = adapt(T, new Map([...fitGroups].filter(([c]) => adapted.includes(c))), lambda, calibrate)
       const onA = valE.map((e, i) => [e, valV[i]] as const).filter(([e]) => teachesAny(e, adapted))
       const onB = valE.map((e, i) => [e, valV[i]] as const).filter(([e]) => teachesAny(e, held))
       const accA = accuracy(scoreWith(Tl)(onA.map(([, v]) => v)), onA.map(([e]) => e)).top1
       const accB = accuracy(scoreWith(Tl)(onB.map(([, v]) => v)), onB.map(([e]) => e)).top1
       total += (accA + accB) / 2
+      sumA += accA / 2
+      sumB += accB / 2
     }
     const score = total / 2
-    console.log(`  λ=${lambda.toFixed(1)}  validation (adapted + untouched dishes) ${pct(score)}`)
-    if (score > best.score + 0.002) best = { lambda, score }
+    console.log(`  ${calibrate ? 'calibrated' : 'plain     '} λ=${lambda.toFixed(2)}  validation ${pct(score)}  (adapted dishes ${pct(sumA)}, untouched dishes ${pct(sumB)})`)
+    if (score > best.score + 0.002) best = { lambda, calibrate, score }
   }
 
-  const final = adapt(T, group(train, trainV), best.lambda)
-  const report = (name: string, Tx: Float32Array[]) => {
+  const final = adapt(T, group(train, trainV), best.lambda, best.calibrate)
+  const report = (name: string, Tx: Adapted) => {
     const a = accuracy(scoreWith(Tx)(testV), test)
     const w = accuracy(scoreWith(Tx)(wikiV), wiki)
     console.log(`${name.padEnd(28)} test top1 ${pct(a.top1)} top3 ${pct(a.top3)} (n=${a.n})   wiki top1 ${pct(w.top1)} top3 ${pct(w.top3)} (n=${w.n})`)
     return { test: a, wiki: w }
   }
-  const zero = report('zero-shot', T)
-  const few = report(`few-shot λ=${best.lambda}`, final)
+  const zero = report('zero-shot', unadapted(T))
+  const few = report(`few-shot λ=${best.lambda}${best.calibrate ? ' calibrated' : ''}`, final)
 
   if (process.argv.includes('--write')) {
-    const d = final[0].length
+    const d = final.vecs[0].length
     const bytes: number[] = []
     const scales: number[] = []
-    for (const v of final) {
+    for (const v of final.vecs) {
       const max = Math.max(...v.map(Math.abs))
       const scale = max / 127
       for (let j = 0; j < d; j++) bytes.push(Math.round(v[j] / scale) & 0xff)
@@ -106,7 +109,8 @@ async function main() {
       dtype: spec.dtype,
       tta,
       dim: d,
-      method: `prompt-ensembled text embeddings, few-shot adapted (λ=${best.lambda}) on ${train.length} labelled photos`,
+      method: `prompt-ensembled text embeddings, few-shot adapted (λ=${best.lambda}${best.calibrate ? ', bias-calibrated' : ''}) on ${train.length} labelled photos`,
+      bias: final.bias.map((b) => Number(b.toFixed(5))),
       eval: { zeroShot: zero, fewShot: few },
       ids: FOODS.map((f) => f.id),
       scales,

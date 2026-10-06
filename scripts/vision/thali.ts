@@ -24,7 +24,7 @@ const raw = Buffer.from(labels.data, 'base64')
 const dishes = labels.ids.map((_, i) => Float32Array.from({ length: labels.dim }, (_, j) => ((raw[i * labels.dim + j] << 24) >> 24) * labels.scales[i]))
 
 function rank(v: Float32Array) {
-  const logits = dishes.map((t) => 100 * dot(v, t))
+  const logits = dishes.map((t, c) => 100 * (dot(v, t) - ((labels as { bias?: number[] }).bias?.[c] ?? 0)))
   const max = Math.max(...logits)
   const e = logits.map((l) => Math.exp(l - max))
   const sum = e.reduce((a, b) => a + b, 0)
