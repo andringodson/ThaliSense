@@ -5,7 +5,7 @@ import { Card, Chip, Icon } from './ui'
 
 function Trend({ points, unit, label, goal }: { points: { date: string; v: number }[]; unit: string; label: string; goal?: number }) {
   const W = 300, H = 90, P = 8
-  const vs = points.map((p) => p.v).concat(goal ?? [])
+  const vs = points.map((p) => p.v)
   const lo = Math.min(...vs) - 0.5, hi = Math.max(...vs) + 0.5
   const x = (i: number) => P + (i / Math.max(1, points.length - 1)) * (W - 2 * P)
   const y = (v: number) => H - P - ((v - lo) / (hi - lo)) * (H - 2 * P)

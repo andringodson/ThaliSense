@@ -57,6 +57,8 @@ describe('plate score', () => {
     expect(usual).toBeLessThan(balanced)
     expect(treat).toBeLessThan(usual)
     expect(treat).toBeLessThan(55)
+    // The demo's usual idli-and-sweet-coffee breakfast should read as "watch", not "good".
+    expect(usual).toBeLessThan(75)
   })
 })
 

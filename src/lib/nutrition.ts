@@ -69,12 +69,12 @@ export function plateScore(t: Totals): { score: number; band: 'good' | 'watch' |
   if (!t.kcal) return { score: 0, band: 'watch', why: [] }
   const why: string[] = []
   let s = 100
-  const gi = Math.round(t.highGiShare * 35)
+  const gi = Math.round(t.highGiShare * 60)
   if (gi >= 8) why.push('fast-acting carbs')
-  const fs = Math.round(t.friedSweetShare * 45)
+  const fs = Math.round(t.friedSweetShare * 60)
   if (fs >= 8) why.push('fried or sweet')
   const proteinShare = (t.protein * 4) / t.kcal
-  const pr = proteinShare < 0.15 ? Math.round(((0.15 - proteinShare) / 0.15) * 25) : 0
+  const pr = proteinShare < 0.15 ? Math.round(((0.15 - proteinShare) / 0.15) * 30) : 0
   if (pr >= 8) why.push('low protein')
   const fibre = (t.fibre / t.kcal) * 100
   const fb = fibre < 1.5 ? Math.round(((1.5 - fibre) / 1.5) * 15) : 0
