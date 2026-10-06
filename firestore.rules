@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Each signed-in user can read and write only their own data:
+//   users/{uid}                 profile, measures, metadata
+//   users/{uid}/months/{yyyy-mm} that month's meal log
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['profile', 'profileAt', 'measures', 'demo', 'updatedAt'])
+        && request.resource.data.measures is list
+        && request.resource.data.measures.size() <= 1000;
+
+      match /months/{month} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && month.matches('^[0-9]{4}-[0-9]{2}$')
+          && request.resource.data.keys().hasOnly(['entries', 'deleted', 'updatedAt'])
+          && request.resource.data.entries is list
+          && request.resource.data.entries.size() <= 3000
+          && request.resource.data.deleted is list;
+      }
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

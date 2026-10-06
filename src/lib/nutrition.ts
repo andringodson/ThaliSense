@@ -13,6 +13,8 @@ export interface LogEntry {
   /** Number of servings, so 2 rotis is qty 2 and half a cup of rice is 0.5. */
   qty: number
   source: 'text' | 'photo' | 'manual' | 'plan'
+  /** Last change (ms), so the newest edit wins when devices sync. */
+  updatedAt?: number
 }
 
 export interface Totals {

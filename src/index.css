@@ -105,7 +105,9 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .nav-tabs button.on { color: var(--text); background: var(--surface-2); }
 .nav-tabs button.on svg { color: var(--accent); }
 .nav .install { align-self: flex-start; }
-.nav-foot { margin-top: auto; display: flex; align-items: center; gap: 6px; }
+.nav-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+.nav-privacy { display: flex; align-items: center; gap: 6px; }
+.nav-account-phone { display: none; }
 .main { min-width: 0; padding: 28px clamp(16px, 3vw, 40px) 48px; }
 .screen-loading { min-height: 60vh; }
 .screen { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
@@ -326,6 +328,10 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
     background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px);
   }
   .nav .brand, .nav-foot, .nav .install { display: none; }
+  .nav-account-phone { display: contents; }
+  .nav-account-phone .account-btn { flex-direction: column; gap: 2px; padding: 6px 10px; font-size: 0.72rem; border: 0; background: none; color: var(--muted); width: auto; }
+  .nav-account-phone .account-avatar { width: 22px; height: 22px; font-size: 0.7rem; }
+  .nav-account-phone .account-name { max-width: 64px; }
   .nav-tabs { flex-direction: row; flex: 1; justify-content: space-around; }
   .nav-tabs button { flex-direction: column; gap: 2px; padding: 6px 10px; font-size: 0.72rem; }
   .nav-tabs button.on { background: none; }
@@ -346,3 +352,48 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
+
+/* Accounts */
+.account-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font-weight: 600; text-align: left; }
+.account-btn:hover { border-color: var(--muted); }
+.account-btn.skeleton { height: 42px; background: var(--surface-2); animation: pulse 900ms infinite alternate; border-color: transparent; }
+.account-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.account-avatar { position: relative; flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+.account-avatar img, .avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.avatar.initials { display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-weight: 700; flex: none; }
+.sync-badge { position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg); background: var(--muted); }
+.sync-badge.sync-synced { background: var(--good); }
+.sync-badge.sync-syncing { background: var(--accent); animation: pulse 700ms infinite alternate; }
+.sync-badge.sync-offline, .sync-badge.sync-error { background: var(--watch); }
+.auth-sheet, .account-sheet { width: min(460px, 100%); }
+.auth-body { padding: 0 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+.providers { display: flex; flex-direction: column; gap: 10px; }
+.btn.provider { width: 100%; padding: 12px 16px; font-size: 0.95rem; gap: 12px; }
+.provider-google { background: #131314; color: #e3e3e3; border-color: #8e918f; }
+/* Facebook's current brand blue: 4.8:1 with white text, where the older #1877f2 is 4.2:1. */
+.provider-facebook { background: #0866ff; color: #fff; border-color: #0866ff; }
+.provider-apple { background: #fff; color: #000; border-color: #fff; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .provider-google { background: #fff; color: #1f1f1f; border-color: #747775; }
+  :root:not([data-theme='dark']) .provider-apple { background: #000; color: #fff; border-color: #000; }
+}
+.or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.8rem; }
+.or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.auth-form { gap: 10px; }
+.password { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding-right: 10px; }
+.password:focus-within { border-color: var(--accent); }
+.password input { border: 0 !important; background: none !important; flex: 1; min-width: 0; }
+.forgot { align-self: flex-start; }
+.auth-msg { min-height: 1.2em; font-size: 0.85rem; }
+.auth-switch { text-align: center; }
+.auth-foot { justify-content: space-between; }
+.account-id { display: flex; align-items: center; gap: 14px; }
+.account-id > div { display: flex; flex-direction: column; min-width: 0; }
+.sync-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+.sync-row .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+.sync-row.sync-synced .sync-dot { background: var(--good); }
+.sync-row.sync-syncing .sync-dot { background: var(--accent); animation: pulse 700ms infinite alternate; }
+.sync-row.sync-offline .sync-dot, .sync-row.sync-error .sync-dot { background: var(--watch); }
+.sync-row .link { margin-left: auto; }
+.account-actions { display: flex; flex-direction: column; gap: 8px; }
+.welcome-signin { color: var(--muted); }

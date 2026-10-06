@@ -152,6 +152,8 @@ export interface Measure {
   date: string
   weightKg: number
   waistCm: number
+  /** When it was logged (ms), for syncing between devices. */
+  at?: number
 }
 
 export const DEFAULT_PROFILE: Profile = {

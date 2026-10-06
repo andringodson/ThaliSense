@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy · ThaliSense</title>
+<meta name="description" content="How ThaliSense handles your data: on-device by default, optional sign-in for backup and sync, and how to delete everything." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<style>
+  :root { --bg: #0a0908; --surface: #141210; --line: #2a2622; --text: #f4efe7; --muted: #a39b90; --accent: #ff9a3c; color-scheme: dark; }
+  @media (prefers-color-scheme: light) { :root { --bg: #faf6f0; --surface: #fff; --line: #e7dfd3; --text: #1d1a16; --muted: #6f675d; --accent: #b25500; color-scheme: light; } }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 8px; }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 16px 0; }
+  ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="/">← ThaliSense</a></p>
+  <h1>Privacy</h1>
+  <p class="muted">Last updated 6 October 2026</p>
+
+  <div class="box">
+    <b>In short:</b> ThaliSense works without an account, and then nothing you enter leaves your device. If you choose to sign in, your profile, meals and progress are backed up to private storage that only your account can read. Food photos are always processed on your device and are never uploaded. We don’t sell data, show ads or use trackers.
+  </div>
+
+  <h2>Without an account</h2>
+  <p>Your profile (age, height, weight, waist, activity, family history, diet, region, budget), the meals you log and your weight and waist history are stored in your browser’s local storage on this device only. Photo recognition runs inside your browser; the vision model is downloaded once from Hugging Face and the photo is never sent anywhere.</p>
+
+  <h2>If you sign in</h2>
+  <ul>
+    <li><b>Sign-in.</b> You can sign in with Google, Facebook, Apple, or an email and password. This is handled by Google Firebase Authentication. From Google, Facebook or Apple we receive only your name, email address and profile photo (Apple lets you hide your email). We never see your password for those services.</li>
+    <li><b>Backup and sync.</b> Your profile, logged meals, deletions and weight and waist history are stored in Google Cloud Firestore under your account, so you can use them on another device. Security rules allow only your signed-in account to read or change them.</li>
+    <li><b>Never uploaded:</b> food photos, and anything else not listed above.</li>
+  </ul>
+
+  <h2>What we don’t do</h2>
+  <p>No advertising, no analytics or tracking scripts, no selling or sharing of your data, and no use of it to train models. ThaliSense is a wellness guide, not a medical device, and does not diagnose anything.</p>
+
+  <h2 id="delete">Deleting your data</h2>
+  <ul>
+    <li><b>Everything, including your account:</b> open ThaliSense, tap your name, then <b>Delete account</b>. This removes your cloud data and your sign-in account immediately, and clears this device.</li>
+    <li><b>Just this device:</b> tap your name, then <b>Sign out and clear this device</b>, or use <b>Delete my data</b> on the Health screen.</li>
+    <li><b>Without app access</b> (for example, if you signed in with Facebook and removed the app from your Facebook settings): open an issue at <a href="https://github.com/andringodson/ThaliSense/issues">github.com/andringodson/ThaliSense/issues</a> asking for deletion, without posting personal details. We will ask you to confirm by signing in and delete your data within 30 days.</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>Questions about privacy: <a href="https://github.com/andringodson/ThaliSense/issues">open an issue on GitHub</a>.</p>
+</main>
+</body>
+</html>

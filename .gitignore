@@ -29,3 +29,8 @@ dist-ssr
 # Playwright
 test-results/
 playwright-report/
+
+# Emulator test build
+dist-emulator/
+firebase-debug.log
+firestore-debug.log

@@ -6,12 +6,15 @@ import '@fontsource/jetbrains-mono/latin-500.css'
 import '@fontsource/jetbrains-mono/latin-600.css'
 import './index.css'
 import App from './App.tsx'
+import { AuthProvider } from './lib/auth'
 import { registerServiceWorker } from './lib/pwa'
 
 registerServiceWorker()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </StrictMode>,
 )

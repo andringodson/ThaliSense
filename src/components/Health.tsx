@@ -96,14 +96,16 @@ function Scale({ value, min, max, marks, label }: { value: number; min: number; 
   )
 }
 
-export function Health({ profile, assessment: a, measures, onMeasure, onChange, onDemo, onClear }: {
+export function Health({ profile, assessment: a, measures, cloud = false, onMeasure, onChange, onDemo, onClear }: {
+  /** Signed in and syncing to the cloud. */
+  cloud?: boolean
   measures: Measure[]
   onMeasure: (m: Measure) => void
   profile: Profile
   assessment: Assessment
   onChange: (p: Profile) => void
   onDemo: () => void
-  onClear: () => void
+  onClear: () => void | Promise<void>
 }) {
   const set = <K extends keyof Profile>(k: K, v: Profile[K]) => onChange({ ...profile, [k]: v })
   const num = (k: 'age' | 'heightCm' | 'weightKg' | 'waistCm' | 'budget', min: number, max: number) => ({
@@ -239,16 +241,18 @@ export function Health({ profile, assessment: a, measures, onMeasure, onChange, 
         <div className="privacy-row">
           <Icon name="shield" size={28} />
           <div>
-            <b>Your data never leaves this device.</b>
+            <b>{cloud ? 'Your data is private and synced.' : 'Your data never leaves this device.'}</b>
             <p className="muted small">
-              No account, no server, no tracking. Meals and profile are stored in this browser only; photo recognition runs locally.
+              {cloud
+                ? 'You are signed in, so your profile, meals and progress are backed up to your own private storage, readable only by your account. Photo recognition still runs on this device and photos are never uploaded.'
+                : 'No account, no server, no tracking. Meals and profile are stored in this browser only; photo recognition runs locally. Sign in only if you want backup and sync across devices.'}{' '}
               ThaliSense is a wellness guide, not a medical device. Talk to a doctor before big diet changes, especially if you have diabetes, kidney disease or are pregnant.
             </p>
           </div>
         </div>
         <div className="privacy-actions">
           <button className="btn" onClick={onDemo}>Load demo week</button>
-          <button className="btn danger" onClick={() => confirm('Delete your profile and all logged meals from this device?') && onClear()}>Delete my data</button>
+          <button className="btn danger" onClick={() => confirm(cloud ? 'Delete your profile, meals and progress from this device and from your cloud backup?' : 'Delete your profile and all logged meals from this device?') && void onClear()}>Delete my data</button>
         </div>
       </Card>
     </div>

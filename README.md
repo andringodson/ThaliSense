@@ -31,7 +31,8 @@ Type “2 roti, dal, bhindi” or snap your thali. ThaliSense works out what you
 | **Track progress** | Log weight and waist weekly; see both trends against the BMI-23 and half-your-height goals. Risk scores recompute instantly. |
 | **Coach agent** | Reviews the last 7 days, finds what matters most, suggests swaps, drafts a 7-day plan, **checks its own plan and repairs it**, checks the budget and picks habits. Every step is shown as a trace. |
 | **7-day regional plan** | South, North, East or West Indian; vegetarian, eggetarian or non-veg; within your ₹/day budget; real portions (never a quarter bowl). One tap logs a planned meal; share the week on WhatsApp. |
-| **Private and offline** | No account, no server, no analytics. Install it to the home screen; it works offline once loaded. Profile, meals and photos stay on the device. |
+| **Optional account** | Sign in with Google, Facebook, Apple or email to back up and sync across devices, or never sign in at all. Local-first: the app always works from the device and syncs in the background. |
+| **Private and offline** | No account needed, no analytics. Install it to the home screen; it works offline once loaded. Photos never leave the device, signed in or not. |
 
 ## How it works
 
@@ -79,15 +80,24 @@ Each dish is one vector: four descriptive prompts per dish, averaged, then moved
 
 ThaliSense is a wellness guide, **not a medical device**. It tells high-risk users to get a blood test and does not diagnose anything.
 
+## Accounts and sync (optional)
+
+Sign-in uses Firebase Authentication (Google, Facebook, Apple, email and password) and Firestore, both on the free Spark plan. The Firebase SDK is **lazy-loaded**, so guests never download it, and sync uses **Firestore Lite** over plain HTTPS. Data is local-first: meals merge by id with the newest edit winning, deletions sync as tombstones, and the demo week or another person's data on a shared device never flows into an account. Security rules give each user access to their own documents only. Setup steps: [docs/auth-setup.md](docs/auth-setup.md). Privacy: [/privacy.html](https://thalisense.vercel.app/privacy.html).
+
+## Speed
+
+Lighthouse mobile: **performance 99, accessibility 100, best practices 100, SEO 100**, with first paint at 1.7 s (it was 89 and 3.0 s before self-hosting fonts and code-splitting). Secondary screens and the Firebase SDK load on demand and are prefetched when the browser is idle. The page is cross-origin isolated with `Document-Isolation-Policy`, so the vision model uses up to 8 WASM threads while sign-in popups still work. The model starts loading when you reach for the camera, or in the background on fast unmetered connections.
+
 ## Quality
 
-- **17 unit tests** (Vitest): food data integrity, Asian BMI and IDRS scoring, the parser (Hinglish, Tamil, typos, grams), plate score ranking, and the agent across all 12 diet × region combinations (every day within 12% of target, no item under half a serving, no repeated items).
+- **23 unit tests** (Vitest): food data integrity, Asian BMI and IDRS scoring, the parser (Hinglish, Tamil, typos, grams), plate score ranking, the agent across all 12 diet × region combinations, and the sync merge rules (newest edit wins, deletions stick, no demo or other-account data leaks).
+- **10 sign-in tests and 3 security-rules tests** against the Firebase emulators: email sign-up, Google, Facebook and Apple sign-in, two-device sync including deletions, wrong-password and reset messages, account deletion that removes the cloud data, accessibility of the sign-in sheets, and rules that keep users out of each other's data.
 - **12 end-to-end tests** (Playwright, desktop and phone): typed logging, the coach run and plan, progress tracking, the manifest, a **WCAG 2 AA axe scan of every screen with no serious issues**, no horizontal overflow, and (locally) real photo recognition of a single dish and a four-dish thali.
 - GitHub Actions runs unit tests, the build and the end-to-end tests on every push; Vercel deploys `main`.
 
 ## Tech
 
-React 19 · TypeScript · Vite · Transformers.js (ONNX Runtime Web, WebGPU/WASM) · MobileCLIP-S2 · Vitest · Playwright + axe · GitHub Actions · Vercel. Cross-origin isolated for multi-threaded WASM; installable PWA with a service worker. No backend, no API keys, no paid services.
+React 19 · TypeScript · Vite · Transformers.js (ONNX Runtime Web, WebGPU/WASM) · MobileCLIP-S2 · Firebase Auth + Firestore Lite (optional) · Vitest · Playwright + axe · Firebase emulators · GitHub Actions · Vercel. Cross-origin isolated for multi-threaded WASM; installable PWA with a service worker. No custom backend and no paid services.
 
 ## Run it
 
@@ -97,6 +107,8 @@ npm run dev        # http://localhost:5173
 npm test           # unit tests
 npm run build
 npm run e2e        # Playwright end-to-end tests against the production build
+npm run test:rules # Firestore security rules (starts the emulator; needs Java)
+npm run e2e:auth   # sign-in and sync tests against the Firebase emulators
 ```
 
 To rebuild the dish vectors after editing the food list, see [docs/vision.md](docs/vision.md#reproduce).
