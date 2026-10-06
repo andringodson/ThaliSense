@@ -16,7 +16,7 @@ Links for every form:
 
 - Live app: https://thalisense.vercel.app
 - Code: https://github.com/andringodson/ThaliSense
-- Demo video (2 min 39 s): https://github.com/andringodson/ThaliSense/releases/download/v1.0/ThaliSense-demo.mp4
+- Demo video (2 min 59 s): https://github.com/andringodson/ThaliSense/releases/download/v1.1/ThaliSense-demo.mp4
 
 Hack-A-Throne asks for a Google Drive link for the video. Upload `ThaliSense-demo.mp4` to Drive, set sharing to *Anyone with the link*, and paste that link.
 
