@@ -124,6 +124,13 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .chip.band-watch { background: color-mix(in srgb, var(--watch) 16%, transparent); color: var(--watch); }
 .chip.band-high { background: color-mix(in srgb, var(--high) 16%, transparent); color: var(--high); }
 
+/* Plate score */
+.card-meta { display: inline-flex; align-items: center; gap: 10px; flex: none; }
+.plate-score { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-size: 0.78rem; font-weight: 700; border: 2.5px solid; }
+.plate-score.band-good { color: var(--good); border-color: var(--good); }
+.plate-score.band-watch { color: var(--watch); border-color: var(--watch); }
+.plate-score.band-high { color: var(--high); border-color: var(--high); }
+
 /* Log bar */
 .logbar { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 .seg { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 12px; overflow-x: auto; scrollbar-width: none; }
@@ -292,7 +299,9 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .conf { position: relative; height: 18px; border-radius: 6px; background: var(--track); overflow: hidden; display: grid; place-items: center; }
 .conf-bar { position: absolute; left: 0; top: 0; bottom: 0; background: color-mix(in srgb, var(--accent) 45%, transparent); }
 .conf .num { position: relative; }
+.scanning { animation: pulse 900ms infinite alternate; }
 .conf.companion { background: none; border: 1px dashed var(--line); color: var(--muted); font-size: 0.7rem; }
+.conf.region { border-style: solid; border-color: color-mix(in srgb, var(--good) 50%, transparent); color: var(--good); }
 
 /* Welcome */
 .welcome { min-height: 100vh; display: grid; place-items: center; padding: 40px 16px; background:

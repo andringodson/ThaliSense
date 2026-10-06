@@ -49,6 +49,15 @@ export function Meter({ label, value, target, unit = 'g', invert = false }: { la
   )
 }
 
+export function PlateScore({ score, band, why }: { score: number; band: Band; why: string[] }) {
+  const label = `Plate score ${score} out of 100${why.length ? `: ${why.join(', ')}` : ''}`
+  return (
+    <span className={`plate-score band-${band}`} title={label} aria-label={label}>
+      <span className="num">{score}</span>
+    </span>
+  )
+}
+
 export function Chip({ band, children }: { band: Band; children: ReactNode }) {
   return <span className={`chip band-${band}`}>{children}</span>
 }

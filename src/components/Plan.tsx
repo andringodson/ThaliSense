@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { CoachReport } from '../lib/agent'
 import type { LogEntry, Meal } from '../lib/nutrition'
-import { Card, Icon, Meter, qtyLabel } from './ui'
+import { plateScore } from '../lib/nutrition'
+import { Card, Icon, Meter, PlateScore, qtyLabel } from './ui'
 
 const TITLE: Record<Meal, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' }
 
@@ -68,7 +69,7 @@ export function Plan({ report, onLog }: { report: CoachReport; onLog: (items: { 
           {d.meals.map((m) => {
             const key = `${d.date}-${m.meal}`
             return (
-              <Card key={m.meal} title={<><span className="eyebrow">{TITLE[m.meal]}</span> {m.name}</>} action={<span className="num muted small">{m.totals.kcal} kcal · {m.totals.protein} g P</span>}>
+              <Card key={m.meal} title={<><span className="eyebrow">{TITLE[m.meal]}</span> {m.name}</>} action={<span className="card-meta"><span className="num muted small">{m.totals.kcal} kcal · {m.totals.protein} g P</span><PlateScore {...plateScore(m.totals)} /></span>}>
                 <ul className="plan-items">
                   {m.items.map((it) => (
                     <li key={it.food.id}>

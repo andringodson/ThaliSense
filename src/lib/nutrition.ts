@@ -60,6 +60,30 @@ export function totals(entries: LogEntry[]): Totals {
   )
 }
 
+/**
+ * Plate score, 0 to 100: how balanced a meal is, regardless of its size.
+ * Starts at 100 and loses points for a high-GI or fried and sweet share of
+ * energy, protein under 15% of energy, and fibre under 1.5 g per 100 kcal.
+ */
+export function plateScore(t: Totals): { score: number; band: 'good' | 'watch' | 'high'; why: string[] } {
+  if (!t.kcal) return { score: 0, band: 'watch', why: [] }
+  const why: string[] = []
+  let s = 100
+  const gi = Math.round(t.highGiShare * 35)
+  if (gi >= 8) why.push('fast-acting carbs')
+  const fs = Math.round(t.friedSweetShare * 45)
+  if (fs >= 8) why.push('fried or sweet')
+  const proteinShare = (t.protein * 4) / t.kcal
+  const pr = proteinShare < 0.15 ? Math.round(((0.15 - proteinShare) / 0.15) * 25) : 0
+  if (pr >= 8) why.push('low protein')
+  const fibre = (t.fibre / t.kcal) * 100
+  const fb = fibre < 1.5 ? Math.round(((1.5 - fibre) / 1.5) * 15) : 0
+  if (fb >= 6) why.push('low fibre')
+  s -= gi + fs + pr + fb
+  const score = Math.max(0, Math.min(100, s))
+  return { score, band: score >= 75 ? 'good' : score >= 55 ? 'watch' : 'high', why }
+}
+
 export function progress(t: Totals, target: Targets) {
   return {
     kcal: t.kcal / target.kcal,

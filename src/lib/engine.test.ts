@@ -5,6 +5,7 @@ import { runCoach, suggestNext } from './agent'
 import { demoLogs } from './demo'
 import { DEFAULT_PROFILE, assess, bmiClass, idrs, type Profile } from './health'
 import { parseMeal } from './parser'
+import { plateScore, sumItems } from './nutrition'
 
 describe('food data', () => {
   it('has unique ids and sane energy', () => {
@@ -43,6 +44,19 @@ describe('health', () => {
   it('never sets a target below the safe floor', () => {
     const tiny: Profile = { ...DEFAULT_PROFILE, heightCm: 148, weightKg: 52, age: 60 }
     expect(assess(tiny).targets.kcal).toBeGreaterThanOrEqual(1200)
+  })
+})
+
+describe('plate score', () => {
+  const score = (items: [string, number][]) => plateScore(sumItems(items.map(([id, qty]) => ({ food: FOOD_BY_ID[id], qty })))).score
+  it('ranks balanced plates above fried, sweet and refined ones', () => {
+    const balanced = score([['pesarattu', 2], ['curd', 1], ['sprouts', 0.5]])
+    const usual = score([['idli', 4], ['coconut-chutney', 1], ['coffee', 1]])
+    const treat = score([['samosa', 2], ['jalebi', 1], ['chai', 1]])
+    expect(balanced).toBeGreaterThanOrEqual(75)
+    expect(usual).toBeLessThan(balanced)
+    expect(treat).toBeLessThan(usual)
+    expect(treat).toBeLessThan(55)
   })
 })
 

@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { FOOD_BY_ID } from '../data/foods'
 import { suggestNext } from '../lib/agent'
 import type { Assessment, Profile } from '../lib/health'
-import { MEALS, totals, type LogEntry, type Meal } from '../lib/nutrition'
+import { MEALS, plateScore, totals, type LogEntry, type Meal } from '../lib/nutrition'
 import { LogBar } from './LogBar'
-import { Card, Chip, Icon, Meter, Ring, Stepper, qtyLabel } from './ui'
+import { Card, Chip, Icon, Meter, PlateScore, Ring, Stepper, qtyLabel } from './ui'
 
 const TITLE: Record<Meal, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snacks' }
 
@@ -89,7 +89,7 @@ export function Today({ profile, assessment, entries, meal, onMeal, onAdd, onQty
           const list = entries.filter((e) => e.meal === m)
           const mt = totals(list)
           return (
-            <Card key={m} title={TITLE[m]} action={<span className="num muted small">{mt.kcal} kcal</span>} className={list.length ? '' : 'empty'}>
+            <Card key={m} title={TITLE[m]} action={<span className="card-meta"><span className="num muted small">{mt.kcal} kcal</span>{list.length > 0 && <PlateScore {...plateScore(mt)} />}</span>} className={list.length ? '' : 'empty'}>
               {list.length ? (
                 <ul className="entries">
                   {list.map((e) => {
