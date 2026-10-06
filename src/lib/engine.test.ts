@@ -112,6 +112,21 @@ describe('coach agent', () => {
       }
   })
 
+  it('serves real portions with no repeated items in a meal', () => {
+    for (const diet of ['veg', 'egg', 'nonveg'] as const)
+      for (const region of ['north', 'south', 'east', 'west'] as const) {
+        const r = runCoach({ ...DEFAULT_PROFILE, diet, region }, demoLogs(today), today)
+        for (const d of r.plan) {
+          expect(Math.abs(d.totals.kcal / r.assessment.targets.kcal - 1), `${region}/${diet} ${d.date}`).toBeLessThan(0.12)
+          for (const m of d.meals) {
+            const ids = m.items.map((i) => i.food.id)
+            expect(new Set(ids).size, `${m.name}: ${ids}`).toBe(ids.length)
+            for (const it of m.items) expect(it.qty, `${m.name}: ${it.food.id}`).toBeGreaterThanOrEqual(0.5)
+          }
+        }
+      }
+  })
+
   it('suggests a next meal', () => {
     expect(suggestNext(DEFAULT_PROFILE, [], 'dinner').length).toBe(3)
   })

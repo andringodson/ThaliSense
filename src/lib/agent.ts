@@ -82,6 +82,12 @@ const FLEX_STEP: Record<string, number> = {
   paratha: 0.5, uttapam: 0.5,
 }
 
+/** Portion step for a food: quarter bowls for rice-like dishes, whole pieces otherwise. */
+const stepOf = (f: Food) => FLEX_STEP[f.id] ?? (f.tags.includes('staple') ? 1 : 0.5)
+
+/** Smallest portion that still reads as a real serving: half a bowl, or one piece. */
+const minOf = (f: Food) => (stepOf(f) < 0.5 ? 0.5 : stepOf(f) < 1 && f.tags.includes('staple') ? 1 : stepOf(f))
+
 /** Small seeded PRNG so a plan is stable for a given day and profile. */
 function rng(seed: string) {
   let h = 1779033703 ^ seed.length
@@ -110,9 +116,9 @@ export function scaleTemplate(t: Template, kcal: number): Item[] {
   const baseKcal = sumItems(base).kcal
   return base.map((it) => {
     if (it.food.id !== t.flex) return it
-    const step = FLEX_STEP[it.food.id] ?? 1
+    const step = stepOf(it.food)
     const raw = it.qty + (kcal - baseKcal) / it.food.kcal
-    const lo = Math.max(step, it.qty * 0.5)
+    const lo = Math.max(minOf(it.food), it.qty * 0.5)
     const hi = it.qty * 1.75 + step
     const qty = Math.min(hi, Math.max(lo, Math.round(raw / step) * step))
     return { ...it, qty }
@@ -122,9 +128,13 @@ export function scaleTemplate(t: Template, kcal: number): Item[] {
 interface ScoreCtx {
   profile: Profile
   slotBudget: number
+  /** Calories this meal should come to. */
+  slotKcal: number
   riskHigh: boolean
   usedCount: Map<string, number>
   yesterday: Set<string>
+  /** Staples already planned today, so rice or ragi isn't served twice. */
+  todayStaples?: Set<string>
   rand: () => number
 }
 
@@ -143,6 +153,11 @@ function scoreTemplate(t: Template, c: ScoreCtx): number {
   if (costShare > 1) s -= (costShare - 1) * 1.5
   s -= 1.2 * (c.usedCount.get(t.id) ?? 0)
   if (c.yesterday.has(t.id)) s -= 2
+  if (t.flex && c.todayStaples?.has(t.flex)) s -= 1.5
+  // Penalise meals that stay too heavy even at their smallest sensible size,
+  // so a 1200 kcal day gets light dishes instead of shrunken heavy ones.
+  const smallest = sumItems(scaleTemplate(t, 0)).kcal
+  if (smallest > c.slotKcal * 1.1) s -= 4 * (smallest / c.slotKcal - 1.1)
   return s + c.rand() * 0.4
 }
 
@@ -164,8 +179,13 @@ const BOOSTERS: [string, number][] = [
   ['curd', 1],
 ]
 
-/** Foods whose portion can shrink when a day runs over: staples first, then rich sides. */
-const TRIMMABLE = (f: Food) => f.tags.includes('staple') || f.fat * 9 > f.kcal * 0.5
+/**
+ * Foods whose portion can shrink when a day runs over: staples, snacks and
+ * rich sides. Protein foods only shrink once the day's protein is covered.
+ */
+const trimmable = (f: Food, proteinMet: boolean) =>
+  (proteinMet || !f.tags.includes('protein')) &&
+  (f.tags.includes('staple') || f.tags.includes('snack') || f.fat * 9 > f.kcal * 0.5)
 
 function retotal(day: PlanDay) {
   for (const m of day.meals) m.totals = sumItems(m.items)
@@ -182,10 +202,11 @@ function verifyDay(day: PlanDay, tg: Targets, p: Profile): string[] {
   const used = new Set<string>()
   for (const slot of ['dinner', 'lunch', 'breakfast'] as Meal[]) {
     if (t.protein >= tg.protein * 0.92) break
-    const booster = BOOSTERS.map(([id, qty]) => ({ food: FOOD_BY_ID[id], qty }))
-      .find((b) => allowed(b.food, p.diet) && !used.has(b.food.id))
     const target = day.meals.find((m) => m.meal === slot)
-    if (!booster || !target) continue
+    if (!target) continue
+    const booster = BOOSTERS.map(([id, qty]) => ({ food: FOOD_BY_ID[id], qty }))
+      .find((b) => allowed(b.food, p.diet) && !used.has(b.food.id) && !target.items.some((i) => i.food.id === b.food.id))
+    if (!booster) continue
     used.add(booster.food.id)
     target.items = [...target.items, booster]
     notes.push(`Protein was ${t.protein} g of ${tg.protein} g, so added ${booster.qty} × ${booster.food.name} to ${slot}.`)
@@ -198,9 +219,9 @@ function verifyDay(day: PlanDay, tg: Targets, p: Profile): string[] {
   for (let guard = 0; guard < 30 && t.kcal > tg.kcal * 1.06; guard++) {
     const candidates = day.meals
       .flatMap((m) => m.items)
-      .filter((i) => TRIMMABLE(i.food))
-      .map((i) => ({ i, step: FLEX_STEP[i.food.id] ?? (i.qty >= 1 ? 1 : 0.25) }))
-      .filter(({ i, step }) => i.qty - step >= step)
+      .filter((i) => trimmable(i.food, t.protein >= tg.protein))
+      .map((i) => ({ i, step: stepOf(i.food) }))
+      .filter(({ i, step }) => i.qty - step >= minOf(i.food))
       .sort((a, b) => b.i.food.kcal * b.step - a.i.food.kcal * a.step)
     if (!candidates.length) break
     candidates[0].i.qty -= candidates[0].step
@@ -213,11 +234,28 @@ function verifyDay(day: PlanDay, tg: Targets, p: Profile): string[] {
       .filter((i): i is Item => !!i)
     if (!flexes.length) break
     const f = flexes[guard % flexes.length]
-    f.qty += FLEX_STEP[f.food.id] ?? 1
+    f.qty += stepOf(f.food)
     t = retotal(day)
   }
   if (Math.abs(t.kcal - before) >= 20) {
     notes.push(`Energy was ${before} kcal against ${tg.kcal}, so ${t.kcal < before ? 'trimmed' : 'increased'} staple portions (now ${t.kcal} kcal).`)
+  }
+
+  // 3. Still too heavy at sensible portions: swap the heaviest main meal for
+  //    the lighter template that brings the day closest to target.
+  if (t.kcal > tg.kcal * 1.08) {
+    const heavy = day.meals.filter((m) => m.meal !== 'snack').sort((a, b) => b.totals.kcal - a.totals.kcal)[0]
+    const rest = t.kcal - heavy.totals.kcal
+    const best = TEMPLATES.filter((x) => x.meal === heavy.meal && x.id !== heavy.templateId && templateAllowed(x, p))
+      .map((x) => planMeal(x, heavy.meal, tg.kcal * SLOT_SHARE[heavy.meal]))
+      .map((m) => ({ m, off: Math.abs(rest + m.totals.kcal - tg.kcal), protein: m.totals.protein }))
+      .sort((a, b) => a.off - b.off || b.protein - a.protein)[0]
+    if (best && rest + best.m.totals.kcal < t.kcal) {
+      const i = day.meals.indexOf(heavy)
+      day.meals[i] = best.m
+      t = retotal(day)
+      notes.push(`Still over target, so swapped ${heavy.meal} (${heavy.name}) for a lighter ${best.m.name} (now ${t.kcal} kcal).`)
+    }
   }
 
   day.totals = t
@@ -447,9 +485,10 @@ export function runCoach(p: Profile, logs: LogEntry[], today: Date = new Date())
     date.setDate(date.getDate() + d)
     const meals: PlannedMeal[] = []
     const todays = new Set<string>()
+    const todayStaples = new Set<string>()
     for (const meal of MEALS) {
       const kcal = tg.kcal * SLOT_SHARE[meal]
-      const ctx: ScoreCtx = { profile: p, slotBudget: p.budget * SLOT_SHARE[meal], riskHigh, usedCount, yesterday, rand }
+      const ctx: ScoreCtx = { profile: p, slotBudget: p.budget * SLOT_SHARE[meal], slotKcal: kcal, riskHigh, usedCount, yesterday, todayStaples, rand }
       const best = TEMPLATES.filter((t) => t.meal === meal)
         .map((t) => ({ t, s: scoreTemplate(t, ctx) }))
         .filter((x) => x.s > -Infinity)
@@ -457,6 +496,7 @@ export function runCoach(p: Profile, logs: LogEntry[], today: Date = new Date())
       if (!best) continue
       usedCount.set(best.t.id, (usedCount.get(best.t.id) ?? 0) + 1)
       todays.add(best.t.id)
+      if (best.t.flex) todayStaples.add(best.t.flex)
       meals.push(planMeal(best.t, meal, kcal))
     }
     yesterday = todays
@@ -528,6 +568,7 @@ export function suggestNext(p: Profile, todays: LogEntry[], meal: Meal, count = 
   const ctx: ScoreCtx = {
     profile: p,
     slotBudget: p.budget * SLOT_SHARE[meal],
+    slotKcal: kcal,
     riskHigh: a.idrsBand !== 'good',
     usedCount: new Map(),
     yesterday: new Set(),
